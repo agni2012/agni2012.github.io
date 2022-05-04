@@ -5,15 +5,19 @@
 	
 		<meta charset="utf-8">
 		<title>			webpage | by Agni Rammohan		</title>
-		<link rel="preconnect" href="https://fonts.googleapis.com">
+		
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto:wght@100&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Diplomata+SC&family=Roboto:wght@100&display=swap" rel="stylesheet">
  <style>
-        .backgroundAndOther{
+        body{
             background:grey;
             color:black;
             text-align: center;
             font-family: 'Anton', sans-serif;
+        }
+        .h1-1{
+            font-family: 'Diplomata SC', cursive;
         }
     </style>
 	</head>
@@ -48,6 +52,48 @@
 	            document.getElementById("me/pro.").innerHTML=""
 	        }
 	        
+	    </script>
+	    <p>.</p>
+	    <p>.</p>
+	    <p>.</p>
+	    <p>.</p>
+	    <p>.</p>
+	    
+	    <h1 class="h1-1">Great, you know me now.</h1>
+	    <div class="h1-1"> lets have a game:<br>
+	    Its called...<br>
+	    <button style="background:black;color:red;" onClick="tell();">click to tell</button>
+	    </div>
+	    <p id="tell"></p>
+	    <script>
+	        
+            function arrayRemove(arr, value) { 
+            
+                return arr.filter(function(ele){ 
+                    return ele != value; 
+                });
+            }
+            
+            
+            
+	        tell=function(){
+	            document.getElementById("tell").innerHTML="Find the thing!<br>OK fine Its not so intresting... jk not true<br><button style='background:black;color:red;' onClick='play();' id='button'>Play</button><p id='play'></p>";
+	            
+	        }
+	        function play(){
+	            
+	            document.getElementById("button").innerHTML="Play Again"
+	            var str=[];
+	            var chars=["q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m",];
+	            
+	            var find=chars[Math.floor((Math.random() * chars.length))];
+	            chars=arrayRemove(chars,find);
+	            for(var i=0;i<20;i++){
+	                str.push(chars[Math.floor((Math.random() * chars.length))]);
+	            }
+	            str.splice(Math.floor((Math.random() * chars.length)), 0, find)
+	            document.getElementById("play").innerHTML="<div class='h1-1'>find: "+find+"<br>"+str.join("")+"</div>";
+	        }
 	    </script>
 	</body>
 </html>
