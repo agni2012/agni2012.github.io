@@ -80,20 +80,25 @@
 	            document.getElementById("tell").innerHTML="Find the thing!<br>OK fine Its not so intresting... jk not true<br>rules: find the letter in the text. once you find it,  click play again and repeat.<br><button style='background:black;color:red;' onClick='play();' id='button'>Play</button><p id='play'></p>";
 	            
 	        }
+	        var hard=0;
 	        function play(){
-	            
+	            hard+=5;
 	            document.getElementById("button").innerHTML="Play Again"
 	            var str=[];
-	            var chars=["q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m",];
+	            var chars=["q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m"];
 	            
 	            var find=chars[Math.floor((Math.random() * chars.length))];
 	            chars=arrayRemove(chars,find);
-	            for(var i=0;i<20;i++){
+	            for(var i=0;i<20+hard;i++){
 	                str.push(chars[Math.floor((Math.random() * chars.length))]);
+	                if(i%20==0&&i!==0){
+	                    str.push("<br>")
+	                }
 	            }
 	            str.splice(Math.floor((Math.random() * chars.length)), 0, find)
 	            document.getElementById("play").innerHTML="<div class='h1-1'>find: "+find+"<br>"+str.join("")+"</div>";
 	        }
+	        
 	    </script>
 	</body>
 </html>
