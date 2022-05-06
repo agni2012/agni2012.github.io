@@ -89,14 +89,14 @@
 	            
 	            var find=chars[Math.floor((Math.random() * chars.length))];
 	            chars=arrayRemove(chars,find);
-	            for(var i=0;i<20+hard;i++){
+	            for(var i=0;i<50+hard;i++){
 	                str.push(chars[Math.floor((Math.random() * chars.length))]);
 	                if(i%20==0&&i!==0){
 	                    str.push("<br>")
 	                }
 	            }
 	            str.splice(Math.floor((Math.random() * str.length)), 0, find)
-	            document.getElementById("play").innerHTML="<div class='h1-1'>find: "+find+"<br>"+str.join("")+"</div>";
+	            document.getElementById("play").innerHTML="<div class='h1-1'>find: "+find+"<br>"+str.join("")+"<br><br>Once you find it, click Play again and try again. You might   find out that it becomes harded to play</div>";
 	        }
 	        
 	    </script>
