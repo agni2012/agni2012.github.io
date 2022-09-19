@@ -1,104 +1,49 @@
-<!doctype html>
-<html lang="en">
-
-	<head>
-	
-		<meta charset="utf-8">
-		<title>			webpage | by Agni Rammohan		</title>
-		
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Diplomata+SC&family=Roboto:wght@100&display=swap" rel="stylesheet">
- <style>
-        body{
-            background:grey;
-            color:black;
-            text-align: center;
-            font-family: 'Anton', sans-serif;
+<!DOCTYPE html>
+<html class="head">
+    <style>
+        .head{
+            background-color:black;
+            font-family:monospace;
+            color:white;
         }
-        .h1-1{
-            font-family: 'Diplomata SC', cursive;
+        .home{
+            font-size:20px;
+            
+            /*border:3px solid red;*/
+            margin:80px;
+            color:red;
+        }
+        
+        .games{
+            font-size:20px;
+            
+            /*border:3px solid green;*/
+            margin:50px;
+            color:green;
+        }
+        .me{
+            font-size:20px;
+                        
+            /*border:3px solid blue;*/
+            margin:50px;
+            color:blue;
         }
     </style>
-	</head>
-	
+    <head>
+        <title>webpage,...</title>
+    </head>
+    <body>
     
-	<body class="backgroundAndOther">
-	    <h1>
-	        Agni Rammohan<br>
-	    </h1>
-	    
-	    <button style="background:black;color:red;" onClick="me();">--------Me--------</button>
-	    <br>
-	    <button style="background:black;color:red;" onClick="Pro();">-----Projects-----</button>
-	    <br>
-	    Things i use:<br>
-	    codehs.org<br>
-	    khanacademy.org<br>
-	    github.com
-	    <br>
-	    *please note, Those aren't links
-	    <p id="me/pro."></p>
-	    <script>
-	        me=function(){
-	            document.getElementById("me/pro.").innerHTML="I am AGNI RAMMOHAN, a programmer that learned to code on Khan Academy<br>I am (200/15-(3+1/3))<br>solve it, and you will know.DO NOT READ ON TILL YOU SOLVE THAT!!!!<p></p><p></p>I go to GRAYSTONE ELEMENTRY, in California, San Jose.<br><button onClick='none();' style=background:black;color:red;>Back</button>";
-	            
-	        }
-	        Pro=function(){
-	            document.getElementById("me/pro.").innerHTML="Circle:<a href='https://www.khanacademy.org/computer-programming/circle/5489059736535040' target='_blank'>circle</a><br><button onClick='none();' style=background:black;color:red;>Back</button>";
-	        }
-	        //me();
-	        none=function(){
-	            document.getElementById("me/pro.").innerHTML=""
-	        }
-	        
-	    </script>
-	    <p>.</p>
-	    <p>.</p>
-	    <p>.</p>
-	    <p>.</p>
-	    <p>.</p>
-	    
-	    <h1 class="h1-1">Great, you know me now.</h1>
-	    <div class="h1-1"> lets have a game:<br>
-	    Its called...<br>
-	    <button style="background:black;color:red;" onClick="tell();">click to tell</button>
-	    </div>
-	    <p id="tell"></p>
-	    <script>
-	    //<p id="users"></p>
-            function arrayRemove(arr, value) { 
-            
-                return arr.filter(function(ele){ 
-                    return ele != value; 
-                });
-            }
-            
-            
-            
-	        tell=function(){
-	            document.getElementById("tell").innerHTML="Find the thing!<br>OK fine Its not so intresting... jk not true<br>rules: find the letter in the text. once you find it,  click play again and repeat.<br><button style='background:black;color:red;' onClick='play();' id='button'>Play</button><p id='play'></p>";
-	            
-	        }
-	        var hard=0;
-	        function play(){
-	            hard+=5;
-	            document.getElementById("button").innerHTML="Play Again"
-	            var str=[];
-	            var chars=["q","w","e","r","t","y","u","i","o","p","a","s","d","f","g","h","j","k","l","z","x","c","v","b","n","m",",",".","/",";","{","}","(",")","[","]","+","-","1","2","3","4","5","6","7","8","9","0","?","~","`","|"];
-	            
-	            var find=chars[Math.floor((Math.random() * chars.length))];
-	            chars=arrayRemove(chars,find);
-	            for(var i=0;i<50+hard;i++){
-	                str.push(chars[Math.floor((Math.random() * chars.length))]);
-	                if(i%20==0&&i!==0){
-	                    str.push("<br>")
-	                }
-	            }
-	            str.splice(Math.floor((Math.random() * str.length)), 0, find)
-	            document.getElementById("play").innerHTML="<div class='h1-1'>find: "+find+"<br>"+str.join("")+"<br><br>Once you find it, click Play again and try again. You might   find out that it becomes harded to play</div>";
-	        }
-	    </script>
-	</body>
+        <a class="home" href="">Home</a>
+        
+        <a class="me" href="">Me</a>
+        <a class="games" href="">Games</a>
+        <hr>
+        <p>
+            Hi, I Am Agni Rammohan! <br>
+            All my games are in the games section!<br>
+            are you in 5th grade?
+        </p>
+    </body>
+    
 </html>
- 
