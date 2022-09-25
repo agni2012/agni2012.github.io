@@ -1,0 +1,14 @@
+
+<form action="https://getform.io/f/fcb7e3c9-eca6-4226-91d8-ec023f6ac4fa" method="POST">
+    Did you like this webpage?<p></p>
+    name:<input type="text" name="name"><br>
+    e-mail addres<input type="email" name="email"><br>
+    text:<input type="text" name="message">
+     checkbox handle 
+    
+     select field handle 
+    
+    <button type="submit">Send</button>
+</form>
+
+
