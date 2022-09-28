@@ -25,8 +25,8 @@
       draw=function(){
 var ys=2;
 var as=5;
-var rec=1249;//W/5 asts.
-var hma=2;
+var rec=1249;//1249W/5 asts.
+var hma=5;
 
 // //draw= function() {
 
@@ -296,7 +296,9 @@ draw= function() {
         textAlign(CENTER,CENTER);
         text("you lose\nscore: "+frameCount,200,200);
         if(frameCount>rec){textSize(30);
-            text("YOU BEAT MY RECORD!\nCONTACT ME!! make sure you put this code at the end: 4305 (to make sure you aren't cheating!)",200,300);
+            text("YOU BEAT MY RECORD!",200,150);
+            textSize(20);
+            text("CONTACT ME!!! tell me your high score!\nmake sure you put this code at the end\n9065\nto make sure you ain't cheatin'!",200,350);
         }
         //h=100;
     }
