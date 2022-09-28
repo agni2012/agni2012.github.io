@@ -19,6 +19,7 @@ var ys=2;
 var as=5;
 var rec=1249;//W/5 asts.
 var hma=2;
+
 // //draw= function() {
 
 // //draw= function() {
@@ -250,14 +251,14 @@ draw= function() {
             //ckground(0);
             //text(h,300,300);
             if(50-abs(ya[i]-y)>25){
-                println("body hit");
+                //println("body hit");
                 b-=50-abs(ya[i]-y);
             }else{
                 if(ya[i]-y<=0){
-                    println("top wing hit");
+                    //println("top wing hit");
                     w1-=abs(50-abs(ya[i]-y))*2;
                 }else{
-                    println("bottom wing hit");
+                    //println("bottom wing hit");
                     w2-=abs(50-abs(ya[i]-y))*2;
                 }
             }
