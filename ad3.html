@@ -74,7 +74,7 @@ var y=200;
 //var p=0;
 textAlign(CENTER);
 fill(11, 0, 227);
-text("click to play\n\n rules:\narrow keys to go up / down\ndodge the asteroids\n click and hold to pause",200,200);
+text("click to play\n\n rules:\narrow keys to go up / down\ndodge the asteroids\n click and hold to pause\nif you beat me, your name will be put up!",200,200);
 draw= function() {
     if(mouseIsPressed){
         gs=1;
@@ -89,7 +89,7 @@ draw= function() {
         b=-35;//h=-1;
     }
     background(0,0, 0);
-    text("my record is... "+ rec,200,10);
+    text("all time record... "+ rec+" by : me",200,10);
     //textSize(100);
     //i-=1/60;
     //text(i,200,200);
@@ -298,7 +298,7 @@ draw= function() {
         if(frameCount>rec){textSize(30);
             text("YOU BEAT MY RECORD!",200,150);
             textSize(20);
-            text("CONTACT ME!!! tell me your high score!\nmake sure you put this code at the end\n9065\nto make sure you ain't cheatin'!",200,350);
+            text("CONTACT ME!!! tell me your high score and your name!\nmake sure you put this code at the end\n9065\nto make sure you ain't cheatin'!",200,350);
         }
         //h=100;
     }
