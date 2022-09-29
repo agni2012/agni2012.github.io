@@ -19,7 +19,7 @@
   <body>
     
     <script>
-     var isM=false; 
+          var isM=false; 
 setup=function(){
   createCanvas(400,400);
 }
@@ -80,16 +80,14 @@ text("click this if you are playing on a mobile / tablet\nInstead of arrow keys 
 text("click to play\n\n rules:\narrow keys to go up / down\ndodge the asteroids\nif you beat me, your name will be put up!",200,200);
 draw= function() {
    
-    if(mouseIsPressed){
+    if(mouseIsPressed&&gs===0){
         if(dist(200,100,mouseX,mouseY)<50){
           isM=true;
         }
         gs=1;
-        frameCount = frameCount - 1;
+        frameCount--;
     }
-    if(gs===0){
-        frameCount = frameCount - 1;
-    }
+    
     if(gs){//no indent
     ys+=0.002;
     as+=0.002;
@@ -319,10 +317,13 @@ draw= function() {
         if(frameCount>rec){textSize(30);
             text("YOU BEAT MY RECORD!",200,150);
             textSize(16);
-            text("CONTACT ME!!! tell me your high score and your name!\nmake sure you put this code at the end\n9065\nto make sure you ain't cheatin'!",200,350);
+            text("CONTACT ME!!! tell me your high score and your name!\nmake sure you put this code at the end\n906"+frameCount+"5\nto make sure you ain't cheatin'!",200,350);
         }
         //h=100;
     }
+    }else{
+      
+        frameCount--;
     }
 };
 }
