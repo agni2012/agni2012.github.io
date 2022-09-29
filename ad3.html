@@ -19,7 +19,8 @@
   <body>
     
     <script>
-      setup=function(){
+      var isM=false; 
+setup=function(){
   createCanvas(400,400);
 }
       draw=function(){
@@ -74,10 +75,15 @@ var y=200;
 //var p=0;
 textAlign(CENTER);
 fill(11, 0, 227);
+        ellipse(200,100,50,50);
+text("click this if you are playing on a mobile / tablet",200,150);
 text("click to play\n\n rules:\narrow keys to go up / down\ndodge the asteroids\n click and hold to pause\nif you beat me, your name will be put up!",200,200);
 draw= function() {
    
     if(mouseIsPressed){
+        if(dist(200,100,mouseX,mouseY)<50){
+          isM=true;
+        }
         gs=1;
         frameCount = frameCount - 1;
     }
@@ -98,12 +104,22 @@ draw= function() {
     //textSize(100);
     //i-=1/60;
     //text(i,200,200);
-    
-    if(keyCode===38&&keyIsPressed){
-        y-=ys;
-    }if(keyCode===40&&keyIsPressed){
-        y+=ys;
+    if(!isM){
+      if(keyCode===38&&keyIsPressed){
+          y-=ys;
+      }if(keyCode===40&&keyIsPressed){
+          y+=ys;
+      }
+    }else{
+      if(dist(0,mouseY,0,y)>3){
+        if(mouseY<y){
+          y-=ys;   
+        }else{
+          y+=ys;
+        }
+      }
     }
+    //if(moblie)
     
     for(var i=0;i<200;i++){
         xst[i]-=random(0,1);
