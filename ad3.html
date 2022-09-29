@@ -76,12 +76,15 @@ textAlign(CENTER);
 fill(11, 0, 227);
 text("click to play\n\n rules:\narrow keys to go up / down\ndodge the asteroids\n click and hold to pause\nif you beat me, your name will be put up!",200,200);
 draw= function() {
+   
     if(mouseIsPressed){
         gs=1;
         frameCount = frameCount - 1;
     }
+    if(gs===0){
+        frameCount = frameCount - 1;
+    }
     if(gs&&!mouseIsPressed){//no indent
-    
     ys+=0.002;
     as+=0.002;
     //dsdfdff
