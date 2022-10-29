@@ -20,10 +20,11 @@
   <body>
     
     <script>
- var setup=function(){
+var setup=function(){
   createCanvas(400,400);
 };
 var fc=0;
+var rec=248;
 draw=function(){
   var win=0;
 var r=0;
@@ -89,8 +90,13 @@ draw= function() {
         }if(win){
           background(0);
           noLoop();
-          textSize(20);
-          text("you found it!!\nScore:"+round(30000/(fc))+"\nThe higher, the BETTER\nCONTACT ME,\n your name will be put up.\n tell me your high score,\n your name and the code\nCODE IS: "+round((fc/43)*100),200,200);
+          if(round(30000/(fc))>rec){
+            textSize(20);
+            text("you found it!!\nScore: "+round(30000/(fc))+"\nThe higher, the BETTER\nCONTACT ME,\n your name will be put up.\n tell me your high score,\n your name and the code\nCODE IS: "+round((fc/43)*100),200,200);
+          }else{
+            text("you found it.\nScore: "+round(30000/(fc)),200,200)
+          }
+          
         }
     }//else{
         //background(255, 0, 0);
