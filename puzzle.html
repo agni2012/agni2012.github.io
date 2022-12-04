@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+    <a href="https://agni2012.github.io/home">Go to home</a><br>
+    <a href="https://agni2012.github.io/games">Go to games</a><br>
+    <a href="https://agni2012.github.io/contact">Go to contact</a><br>
+    <a href="https://agni2012.github.io/me">Go to me</a><br>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/addons/p5.sound.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <p>
+      Rules:
+      Click on the different colors flip the top over, u'l understand.
+      Get all the colors in a group.
+      Do this fast. If u do it faster than the record, tell me and i'll put ur name up!
+    </p>
+    <p>
+      <a href="https://agni2012.github.io/i-spy-1">Play again</a>
+    </p>
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    
+    <script>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+    <a href="https://agni2012.github.io/home">Go to home</a><br>
+    <a href="https://agni2012.github.io/games">Go to games</a><br>
+    <a href="https://agni2012.github.io/contact">Go to contact</a><br>
+    <a href="https://agni2012.github.io/me">Go to me</a><br>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/addons/p5.sound.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <p>
+      <a href="https://agni2012.github.io/i-spy-1">Play again</a>
+    </p>
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    
+    <script>
+var setup=function(){
+  createCanvas(400,400);
+};
+var fc=0;
+var rec=248;
+draw=function(){
+  var win=0;
+var r=0;
+var nw=11;
+var s=0;
+var dw=["its there...","can you find it?","you CANT win","its not easy","look there","...","yeah, but im not here","YOU WILL LOSE","i dont care","you will never find it","can you?","this is the WRONG place", "not here!","it's NOT here"];
+var hw=["HI","u cant find me","hmmm...","IM HERE","where am i?","look here!","YOU CAN'T FIND ME","find me!"];
+var p=[];
+var ax=random(50,350),ay=random(100,350);
+var a=hw[floor(random(0,hw.length))];
+for(var i=0;i<dw.length*nw;i++){
+    p.push([random(50,350),random(100,350)]);
+}
+var db=function(){
+    background(0);
+    for(var i=0;i<800;i+=4){
+        stroke(random(0,100),random(0,100),random(0,100));
+        line(i/2,0,i/2,400);
+    }
+    for(var i=0;i<800;i+=4){
+        stroke(random(0,100),random(0,100),random(0,100));
+        line(0,i/2,400,i/2);
+    }
+};
+var intro=function(){
+    for(var i=0;i<800;i++){
+        stroke(i*(200/800));
+        line(i/2,0,i/2,400);
+    }
+    random();
+    textAlign(CENTER,CENTER);
+    fill(255, 255, 255);
+    textSize(50);
+    text("I-SPY 1.0",200,200);
+    textSize(20);
+    text("Click to play!",200,300);
+    textSize(10);
+    text("WARNING,\nDO NOT USE IF YOU HAVE EPILEPSY",200,350);
+};
+draw= function() {
+    db();
+    if(s===0){
+        intro();
+    }else if(s===1){
+        fc++;
+        textSize(10);
+        for(var i=0;i<hw.length*nw;i++){
+            fill(random(50,255),random(50,255),random(50,255));
+            text(dw[floor(i/nw)],p[floor(i)][0],p[floor(i)][1]);
+        }
+        
+        text(a,ax,ay);
+        fill(255);
+        textSize(40);
+        text("FIND AND CLICK ON:\n"+a,200,50);
+        //text("rounds:"+r,200,200);
+        if(dist(mouseX,mouseY,ax,ay)<25&&mouseIsPressed){
+            win=1;
+            //noLoop();
+            //ackground();
+            s=1;
+            
+        }if(win){
+          background(0);
+          noLoop();
+          if(round(30000/(fc))>rec){
+            textSize(20);
+            text("you found it!!\nScore: "+round(30000/(fc))+"\nThe higher, the BETTER\nCONTACT ME,\n your name will be put up.\n tell me your high score,\n your name and the code\nCODE IS: "+round((fc/43)*100),200,200);
+          }else{
+            text("you found it.\nScore: "+round(30000/(fc))+"\nthe higher, the better!",200,200)
+          }
+          
+        }
+    }//else{
+        //background(255, 0, 0);
+    //}
+    //text(s,200,200);
+};
+//loop();
+mouseClicked=function(){
+    s=1;
+};
+};
+    </script>
+    
+  </body>
+</html>
+
+    </script>
+    
+  </body>
+</html>
