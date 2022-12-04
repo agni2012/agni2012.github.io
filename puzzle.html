@@ -18,7 +18,7 @@
       Do this fast. If u do it faster than the record, tell me and i'll put ur name up!
     </p>
     <p>
-      <a href="https://agni2012.github.io/i-spy-1">Play again</a>
+      <a href="https://agni2012.github.io/puzzle">Play again</a>
     </p>
     <meta charset="utf-8" />
 
@@ -48,94 +48,155 @@
   <body>
     
     <script>
-var setup=function(){
-  createCanvas(400,400);
-};
-var fc=0;
-var rec=248;
-draw=function(){
-  var win=0;
-var r=0;
-var nw=11;
-var s=0;
-var dw=["its there...","can you find it?","you CANT win","its not easy","look there","...","yeah, but im not here","YOU WILL LOSE","i dont care","you will never find it","can you?","this is the WRONG place", "not here!","it's NOT here"];
-var hw=["HI","u cant find me","hmmm...","IM HERE","where am i?","look here!","YOU CAN'T FIND ME","find me!"];
-var p=[];
-var ax=random(50,350),ay=random(100,350);
-var a=hw[floor(random(0,hw.length))];
-for(var i=0;i<dw.length*nw;i++){
-    p.push([random(50,350),random(100,350)]);
+function setup() {
+  createCanvas(400, 400);
 }
-var db=function(){
-    background(0);
-    for(var i=0;i<800;i+=4){
-        stroke(random(0,100),random(0,100),random(0,100));
-        line(i/2,0,i/2,400);
-    }
-    for(var i=0;i<800;i+=4){
-        stroke(random(0,100),random(0,100),random(0,100));
-        line(0,i/2,400,i/2);
-    }
-};
-var intro=function(){
-    for(var i=0;i<800;i++){
-        stroke(i*(200/800));
-        line(i/2,0,i/2,400);
-    }
-    random();
-    textAlign(CENTER,CENTER);
-    fill(255, 255, 255);
-    textSize(50);
-    text("I-SPY 1.0",200,200);
-    textSize(20);
-    text("Click to play!",200,300);
-    textSize(10);
-    text("WARNING,\nDO NOT USE IF YOU HAVE EPILEPSY",200,350);
-};
-draw= function() {
-    db();
-    if(s===0){
-        intro();
-    }else if(s===1){
-        fc++;
-        textSize(10);
-        for(var i=0;i<hw.length*nw;i++){
-            fill(random(50,255),random(50,255),random(50,255));
-            text(dw[floor(i/nw)],p[floor(i)][0],p[floor(i)][1]);
+
+function draw() {
+  var go=0;
+function hasd(a) {
+    var valuesSoFar = Object.create(null);
+    for (var i = 0; i < a.length; ++i) {
+        var value = a[i];
+        if (value in valuesSoFar) {
+            return true;
         }
-        
-        text(a,ax,ay);
-        fill(255);
-        textSize(40);
-        text("FIND AND CLICK ON:\n"+a,200,50);
-        //text("rounds:"+r,200,200);
-        if(dist(mouseX,mouseY,ax,ay)<25&&mouseIsPressed){
-            win=1;
-            //noLoop();
-            //ackground();
-            s=1;
-            
-        }if(win){
-          background(0);
-          noLoop();
-          if(round(30000/(fc))>rec){
-            textSize(20);
-            text("you found it!!\nScore: "+round(30000/(fc))+"\nThe higher, the BETTER\nCONTACT ME,\n your name will be put up.\n tell me your high score,\n your name and the code\nCODE IS: "+round((fc/43)*100),200,200);
-          }else{
-            text("you found it.\nScore: "+round(30000/(fc))+"\nthe higher, the better!",200,200)
-          }
-          
+        valuesSoFar[value] = true;
+    }
+    return false;
+}
+textAlign(CENTER,CENTER);
+var rec= 1000;
+var pr=function(a,p){
+
+    //vr a=[0,1,2,4,5,6,7,8];
+    //var p=1;
+    var ap=[];
+    var apr=[];
+    var awn=[];
+    var lft=[];
+    
+    for(var i=0;i<p;i++){
+        ap.push(a[i]);
+    }
+    for(var i=0;i<a.length-p;i++){
+        lft.push(a[p+i]);
+    }
+    //pr22intln(ap);
+    for(var i=0;i<ap.length;i++){
+        apr.push(ap[ap.length-i-1]);
+    }
+    //pr22intln(apr22);
+    //pr22intln(apr22.concat(lft));
+    return apr.concat(lft);
+};
+var ct=[];
+var c=[];
+var blocks=[];
+var b=10;
+var a=5;
+for(var i=0;i<a;i++){
+    
+    c.push(color(random(0,200),random(0,200),random(0,200)));
+}
+for(var i=0;i<b;i++){
+    blocks.push(round(random(0,a-1)));
+}
+
+for(var i=0;i<5;i++){
+    var am=0;
+    for(var j=0;j<b;j++){
+        if(blocks[j]===i){
+            am++;
         }
-    }//else{
-        //background(255, 0, 0);
+    }
+    c.push(am);
+}
+var ga=[];
+var pr2;
+for(var i=0;i<b;i++){
+    
+    if(blocks[i]!==blocks[pr2]){
+        ga.push(blocks[i]);
+    }
+    pr2++;
+    if(i!==0){
+        //pr2++;
+    }else{
+        pr2=0;
+    }
+    
+    //pr222intln(pr222);
+}
+
+//println(ga);
+draw = function() {
+    //);
+    //println(ga);
+    //b++;
+    background(255, 255, 255);
+    
+    fill(0, 0, 0);
+    
+    for(var i=0;i<b;i++){
+    //    for(var j=0;j<b;j++){
+    //    rect(j*(400/b),i*(400/b),1,1);
     //}
-    //text(s,200,200);
+        stroke(255, 255, 255);
+        fill(c[blocks[i]]);
+        rect(0,i*(400/b),400,400/b);
+        fill(255, 255, 255);
+        text(blocks[i],100,(i*(400/b))+30);
+        if(!hasd(ga)){
+            go=1;
+            //background(255, 0, 0);
+        }
+    }
+    ga=[];
+    for(var i=0;i<b;i++){
+    
+        if(blocks[i]!==blocks[pr2]){
+            ga.push(blocks[i]);
+        }
+        pr2++;
+        if(i!==0){
+            //pr2++;
+        }else{
+            pr2=0;
+        }
+
+    
+    }
+  
+    text("HI SCORE: "+rec+", by: ME!",300,30);
+    text("time: "+frameCount,300,50);
+    //text("hi score",300,20);
+    if(go){
+        if(frameCount===1){
+            blocks=[];
+            for(var i=0;i<b;i++){
+                blocks.push(round(random(0,a-1)));
+            }
+        }
+        background(0);
+        noLoop();
+        text("u vin! time: "+frameCount,200,200);
+        if(frameCount<rec){
+          textSize(8.5);
+            text("contact me cuz u beat my record! please send me this secret code, the code is "+round(frameCount/3.14),200,300);
+        }
+    }
+    //Program.restart();
 };
-//loop();
 mouseClicked=function(){
-    s=1;
+
+        //pr22intln(blocks[floor(mouseY/(400/b))]);
+        blocks=pr(blocks,floor(mouseY/(400/b))+1);
 };
+mouseDragged=function(){
+    blocks=pr(blocks,floor(mouseY/(400/b))-1);
 };
+}
     </script>
     
   </body>
