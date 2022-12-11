@@ -24,7 +24,7 @@ var setup=function(){
   createCanvas(400,400);
 };
 var fc=0;
-var rec=248;
+var rec=347;
 draw=function(){
   var win=0;
 var r=0;
@@ -59,8 +59,9 @@ var intro=function(){
     fill(255, 255, 255);
     textSize(50);
     text("I-SPY 1.0",200,200);
+  
     textSize(20);
-    text("Click to play!",200,300);
+    text("Click to play!\nthe current record is "+rec+" by:\nRhiya!!",200,300);
     textSize(10);
     text("WARNING,\nDO NOT USE IF YOU HAVE EPILEPSY",200,350);
 };
@@ -94,6 +95,7 @@ draw= function() {
             textSize(20);
             text("you found it!!\nScore: "+round(30000/(fc))+"\nThe higher, the BETTER\nCONTACT ME,\n your name will be put up.\n tell me your high score,\n your name and the code\nCODE IS: "+round((fc/43)*100),200,200);
           }else{
+            textSize(20);
             text("you found it.\nScore: "+round(30000/(fc))+"\nthe higher, the better!",200,200)
           }
           
