@@ -66,12 +66,22 @@
                 name remember it and first name capitalized: <input type="text" name="name"> ex: Agni<br>
                 text: <input type="text" name="message"><br>
                 <button type="submit">Send</button><br>
-                replies: (this is a work in progress. Its very insecure but im not telling sensitive info. Also, it is sloooooow (1-3m))
-                not working yet.
-                your name for replies.
-                <input type="text" id="myText" value="your first name capitalized, same as when you send a message">
+                
                 if you win a record make sure you put the code and your name and your score!
         </form>
+        replies: (this is a work in progress. Its very insecure but im not telling sensitive info. Also, it is sloooooow (1-3m))
+        not working yet.
+        your name for replies.
+        <input type="text" id="replyName">
+        <button onClick="proccesName();">submit</button>
+        <p id="replies"></p>
+        <script>
+            function proccesName(){
+                var name=document.getElementById("replyName");
+                
+            }
+        </script>
+                
         </p>
     </body>
     
