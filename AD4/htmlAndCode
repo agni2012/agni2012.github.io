@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+    </main>
+    <script>
+      var cam=0;
+var x=0;
+var y=0;
+var ast=[];
+var n=50;
+var astc=[];
+var AT;
+var ST;
+var keys=[]
+function setup() {
+  angleMode(DEGREES);
+  for(var i=0;i<n;i++){
+    ast[i]=createVector(random(-100,100),random(-100,100),random(-1000,-3000));
+    astc[i]=random(50,150);
+  }
+  ST=loadImage("stars.png");
+  AT = loadImage("AT.png");
+  createCanvas(500,500,WEBGL);
+  
+}
+var DSP=function(x,y){
+  
+  push()
+  translate(x,y,0);
+  rotateY(-90);
+  scale(0.2);
+  fill(100)
+  rotate(90)
+  cylinder(50,150)
+  translate(0,125,0);
+  cone(50,100);
+  translate(0,-200,0);
+  fill(133, 67, 5)
+  cone(25,50)
+  rotate(180);
+  cone(40,100);
+  translate(0,125,0);
+  emissiveMaterial(255, 211, 66);
+  cone(20,200)
+  pop()
+}
+var s=function(x,y,z,c){
+  
+  fill(c);
+  translate(x,y,z);
+  texture(AT)
+  sphere(20);
+  translate(-x,-y,-z);
+}
+function draw() {
+  
+  //orbitControl();
+  background(0);
+  switch(cam){
+    case 0:
+      camera(x,y-50,100,x,y,0);
+    break;
+    case 1:
+      camera(x,y,-1,x,y,-2);
+    break;
+  }
+  normalMaterial()
+  directionalLight(255,255,255,1,1,-1)
+  push()
+  //fill()
+  //box(250,250,3000)
+  
+  for(var i=0;i<n;i++){
+    s(ast[i].x,ast[i].y,ast[i].z,astc[i]);
+    ast[i].z+=frameCount/300+1.5;
+    if(ast[i].z>350){
+      ast[i]=createVector(random(-100,100),random(-100,100),random(-1000,-3000));
+    }
+    if(dist(ast[i].x,ast[i].y,x,y)<30&&ast[i].z>-20&&ast[i].z<20){
+      
+      noLoop();
+      
+    }
+  }
+
+  pop()
+  if(keys.indexOf(UP_ARROW)!==-1&&y>-100){
+    y--;
+  }if(keys.indexOf(DOWN_ARROW)!==-1&&y<100){
+    y++;
+  }if(keys.indexOf(RIGHT_ARROW)!==-1&&x<100){
+    x++;
+  }if(keys.indexOf(LEFT_ARROW)!==-1&&x>-100){
+    x--;
+  }
+  if(keyIsPressed&&key=="1"){
+    cam=1;
+  }if(keyIsPressed&&key=="2"){
+    cam=0;
+  }
+  DSP(x,y);
+}
+
+keyPressed=function(){
+  keys.push(keyCode)
+}
+keyReleased=function(){
+  keys.splice(keys.indexOf(keyCode),1);
+}</script>
+  </body>
+</html>
