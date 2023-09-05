@@ -8,9 +8,13 @@
   </head>
   <body>
     <main>
+      <p id="score">
+      </p>
     </main>
     <script>
-      var cam=0;
+var rec=10;
+var s=0;
+var cam=0;
 var x=0;
 var y=0;
 var ast=[];
@@ -60,7 +64,8 @@ var s=function(x,y,z,c){
   translate(-x,-y,-z);
 }
 function draw() {
-  
+  s++;
+  document.getElementById("score").HTML="score: "+s;
   //orbitControl();
   background(0);
   switch(cam){
@@ -84,7 +89,9 @@ function draw() {
       ast[i]=createVector(random(-100,100),random(-100,100),random(-1000,-3000));
     }
     if(dist(ast[i].x,ast[i].y,x,y)<30&&ast[i].z>-20&&ast[i].z<20){
-      
+      if(s>rec){
+        document.getElementById("score")="OMG U BEAT THE RECORD!!! tell me your score ("+s+") and this code: "+s*3.141*1000+" If you dont tell me your code or score, I can't put your name up!"
+      }
       noLoop();
       
     }
