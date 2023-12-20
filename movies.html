@@ -1,4 +1,4 @@
-s
+
 <!DOCTYPE html>
 <html class="head">
     <style>
@@ -75,12 +75,11 @@ s
                 4. <a href="https://youtu.be/uizGNPDvEXc"> The Blanket Monster</a><br>
                 5. <a href="https://youtu.be/CN_9OYJJ0ZY"> New! Spicy Fire</a><br>
             </p>
-            Enter the secret code to go to the secret<br>
-            <input type="text" placeholder="Code here" id="code">
-            <button type="button" onclick="checkCode();">Done</button><br>
+        <br>
+            <button type="button" onclick="checkCode();">Secret Here</button> <br>
             <script>
                 function checkCode(){
-                    var code = document.getElementById("code").value;
+                    var code = prompt("Enter the secret code to go to the secret. You dont know the secret code? look around");
                     if(code == "thecode123"){
                         alert("READ THIS\ncorrect code! you found secret. u win, now tell me this  'im [your name], and i found the secret. Proof is this code e47tce'" 
                     }else{
