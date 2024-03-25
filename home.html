@@ -69,8 +69,26 @@
         <p>
             Hi, I Am Agni Rammohan! <br>
             All my games are in the games section!<br>
-            are you in 6th grade?
+            are you in 6th grade?<br>
+            Sign In:<br>
+            <label for="uname">username:</label>
+            <input type="text" id="uname" name="uname"><br>
+            <label for="name">name:</label>
+            <input type="text" id="name" name="name"><br>
+            <button onClick="signIn()"></button>button>
+                No Account? <a href="https://agni2012.github.io/signup">click here</a>
+            
+  
+            
         </p>
+        <script>
+            function signIn(){
+                var name=document.getElementById("name").value;
+                var uname=document.getElementById("uname").value;
+            }
+            
+        </script>
+        
     </body>
     
 </html>
