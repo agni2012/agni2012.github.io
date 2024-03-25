@@ -11,7 +11,10 @@
     <input type="text" id="uname" name="uname"><br>
     <button onClick="signUp();">Sign Up</button>
     <script>
-      
+      function signUp(){
+        localStorage.setItem("name", document.getElementById("name").value);
+        localStorage.setItem("uname", document.getElementById("uname").value);
+      }
     </script>
   </body>
 </html>
