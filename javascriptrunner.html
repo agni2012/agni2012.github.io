@@ -3,10 +3,13 @@
   <script>
     
     var urlcode=window.location;
-    alert(urlcode);
-    var _code_=prompt("Enter js code to run:");
-    eval(urlcode);
-    eval(_code_);
+    eval(urlcode.slice(0,55));
+    if(urlcode.slice(0,55)=="")}
+     var _code_=prompt("Enter js code to run:");
+     //eval(urlcode);
+     eval(_code_);
+    }
+    
     
   </script>
 </html>
