@@ -3,12 +3,12 @@
   <script>
     
     var urlcode=window.location;
-    eval(urlcode.slice(0,47));
-    if(urlcode.slice(0,47)=="")}
+    eval(decodeURI(urlcode.slice(0,47)));
+    //if(urlcode.slice(0,47)=="")}
      var _code_=prompt("Enter js code to run:");
      //eval(urlcode);
      eval(_code_);
-    }
+    //}
     
     
   </script>
