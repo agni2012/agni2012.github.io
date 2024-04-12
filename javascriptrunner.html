@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
-  JS runner! urlcode version 2
+  JS runner! urlcode version 3
   <script>
-    alert(decodeURI(window.location.href));
+    alert(decodeURI(window.location.href).slice(47));
     eval(_code_);
     var urlcode=window.location.href;
     eval(decodeURI(urlcode.slice(47,urlcode.length)));
