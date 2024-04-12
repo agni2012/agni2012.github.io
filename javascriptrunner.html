@@ -2,11 +2,12 @@
 <html>
   JS runner! urlcode version 4
   <script>
-    alert(decodeURI(window.location.href).slice(44));
-    eval(_code_);
-    var urlcode=window.location.href;
+    
     eval(decodeURI(urlcode.slice(44,urlcode.length)));
-    var _code_=prompt("Enter js code to run:");
+    if(decodeURI(window.location.href).slice(44)==""){
+      var _code_=prompt("Enter js code to run:");
+      eval(_code_);
+    }
 
     
     
