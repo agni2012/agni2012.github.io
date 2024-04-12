@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 <html>
-  JS runner! urlcode version 4
+  JS runner! urlcode version 5
   <script>
-    
+    var urlcode=window.location.href;
     eval(decodeURI(urlcode.slice(44,urlcode.length)));
     if(decodeURI(window.location.href).slice(44)==""){
       var _code_=prompt("Enter js code to run:");
