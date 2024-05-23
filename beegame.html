@@ -1,286 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  Bee Game
+  The controls are glitchy, you have to press w or a or s or d to move, not hold. Also, no arrow keys
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BEE KILLER</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #87aa00;
-        }
-    </style>
+    <title>Processing Sketch</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.6.6/processing.min.js"></script>
 </head>
 <body>
-<script>
-let beeSize = 5;
-let damage = 1;
-let Bee = function(x, y, health) {
-  this.x = x;
-  this.y = y;
-  this.health = health;
+    <!-- Canvas for the Processing sketch -->
+    <canvas id="mySketch" ></canvas>
+    
+    <!-- Processing.js Sketch -->
+    <script type="application/processing" data-processing-target="mySketch">
+      // CURRENT HIGHEST LEVEL: wave 16
+//MADE BY AGNI R.
+//    
+//  __()__
+// |      0
+// <______/
+//  
+size(400,400);
+var beeSize=5;
+var damage=1;
+var Bee=function(x,y,health){
+    this.x=x;
+    this.y=y; 
+    this.health=health;
 };
-
-Bee.prototype.update = function(px, py, health, bullets, bs) {
-  let dx = this.x - px;
-  let dy = this.y - py;
-  let t = atan2(dy, dx);
-  this.x -= cos(t) + random(-7, 7);
-  this.y -= sin(t) + random(-7, 7);
-  if (dist(px, py, this.x, this.y) < beeSize) {
-    return damage;
-  }
-  for (let i = 0; i < bullets.length; i++) {
-    if (dist(bullets[i].pos.x, bullets[i].pos.y, this.x, this.y) < beeSize / 2 + (0.5 * bs)) {
-      return "DIED" + i;
+Bee.prototype.update=function(px,py,health,bullets,bs){
+    var dx=this.x-px;
+    var dy=this.y-py;
+    var t=atan2(dy,dx);
+    this.x-=cos(t)+random(-7,7);
+    this.y-=sin(t)+random(-7,7);
+    if(dist(px,py,this.x,this.y)<beeSize){
+        return damage;
+       
     }
-  }
-  return 0;
+    for(var i=0;i<bullets.length;i++){
+        if(dist(bullets[i].pos.x,bullets[i].pos.y,this.x,this.y)<beeSize/2+(0.5*bs)){
+            
+            //println("deeeed");
+            return "DIED"+i;
+            
+        }
+        //println(dist(bullets[i].pos.x,bullets[i].pos.y,this.x,this.y));
+    }
+    return 0;
+    
 };
-
 Bee.prototype.display = function() {
-  fill(255, 217, 0);
-  ellipse(this.x, this.y, beeSize, beeSize);
+    fill(255, 217, 0);
+    ellipse(this.x,this.y,beeSize,beeSize);
+};
+var Bullet=function(x,y,dx,dy,bs){
+    
+    this.pos=new PVector(x,y);
+    this.vel=new PVector(dx,dy);
+    this.bs=bs;
 };
 
-let Bullet = function(x, y, dx, dy, bs) {
-  this.pos = createVector(x, y);
-  this.vel = createVector(dx, dy);
-  this.bs = bs;
+
+Bullet.prototype.update=function(){
+    this.pos.add(this.vel);
 };
-
-Bullet.prototype.update = function() {
-  this.pos.add(this.vel);
+Bullet.prototype.draw=function() {
+    fill(0, 0, 0);
+    ellipse(this.pos.x,this.pos.y,this.bs,this.bs);
 };
-
-Bullet.prototype.draw = function() {
-  fill(0, 0, 0);
-  ellipse(this.pos.x, this.pos.y, this.bs, this.bs);
-};
-
-let bulletStrength = 0;
-let isShootingBulletsForward = -3;
-let healthRegen = 0.003;
-let mr = 50;
-let r = 0;
-let p = [];
-let bulletSize = 50;
-let l = 1000;
-let lIncrement = 800;
-let x = 200;
-let y = 200;
-let health = 100;
-let wave = 1;
-let debugWaveStarter = 1;
-l += lIncrement * (debugWaveStarter - 1);
-wave = debugWaveStarter;
-let bullets = [];
-let kip = false;
-let spray = 0;
-let scene = "home";
-let score = 0;
-
-function setup() {
-  createCanvas(400, 400);
-  textAlign(CENTER, CENTER);
-  frameRate(40);
-  for (let i = 0; i < l; i++) {
-    p[i] = new Bee(400 / l * i, 0, 100);
-  }
+var bulletStrength=0;
+var isShootingBulletsForward=-3;//bullet speed, and dir.
+var healthRegen=0.003;
+var mr=50;//machinge gun rate
+var r=0;//how often beez ar spawned
+var p=[];
+var bulletSize=50;
+var l=1000;
+var lIncrement=800;
+var x=200;
+var y=200;
+var health=100;
+var wave=1;
+//bulletSize*=0.5;
+var debugWaveStarter=1;
+l+=lIncrement*(debugWaveStarter-1);
+wave=debugWaveStarter;
+frameRate(40);
+for (var i=0;i<l;i++){
+    p[i]=new Bee(400/(l)*i,0,100);
 }
-
-function draw() {
-  try {
-    if (scene === "home") {
-      background(135, 122, 0);
-      fill(255, 255, 255);
-      textSize(50);
-      text("BEE KILLER", 200, 115);
-      ellipse(200, 200, 100, 100);
-      fill(0, 0, 0);
-      textSize(30);
-      text("play", 200, 200);
-      text("Kill beez with your bullets.\n Finish wave 20 and win", 200, 279);
-      if (mouseIsPressed && dist(mouseX, mouseY, 200, 200) < 50) {
-        scene = "game";
-        textSize(15);
-      }
-    } else if (scene === "game") {
-      score++;
-      background(237, 237, 237);
-      if (wave === 2) {
-        mr = 20;
-        bulletSize = 20;
-      }
-      if (wave === 3) {
-        mr = 3;
-        bulletSize = 10;
-      }
-      if (wave === 4) {
-        mr = 2;
-        bulletSize = 10;
-      }
-      if (wave === 5) {
-        mr = 1;
-        bulletSize = 7;
-        spray = 5;
-      }
-      if (wave === 6) {
-        mr = 1;
-        bulletSize = 3;
-        spray = 5;
-        bulletStrength = 20;
-        healthRegen = 0.05;
-      }
-      if (wave === 7) {
-        mr = 4;
-        bulletSize = 30;
-        spray = 0;
-        bulletStrength = 0;
-      }
-      if (wave === 9) {
-        mr = 100;
-        bulletSize = 100;
-        spray = 0;
-        bulletStrength = 0;
-      }
-      if (wave === 10) {
-        beeSize = 7;
-        mr = 5;
-      }
-      if (wave === 12) {
-        mr = 3;
-        bulletSize = 4;
-        spray = 4;
-        bulletStrength = 0;
-      }
-      if (wave === 15) {
-        damage = 1.5;
-        mr = 200;
-        bulletSize = 50;
-        spray = 0;
-        bulletStrength = 0;
-        beeSize = 9;
-      }
-      if (wave === 17) {
-        mr = 7;
-        beeSize = 12;
-        bulletSize = 3;
-        spray = 0;
-        bulletStrength = 0;
-        damage = 1.7;
-        healthRegen = 0.5;
-      }
-      if (wave === 20) {
-        beeSize = 17;
-        healthRegen = -0.07;
-        damage = 99;
-      }
-      if (wave === 21) {
-        noLoop();
+var bullets=[];
+var kip=false;
+var spray=0;
+var scene="home";
+var score=0;
+textAlign(CENTER,CENTER);
+//sframeRate(10);
+draw= function() {
+    try{
+        if(scene==="home"){
+            background(135, 122, 0);
+            fill(255, 255, 255);
+            textSize(50);
+            text("BEE KILLER",200,115);
+            ellipse(200,200,100,100);
+            fill(0, 0, 0);
+            textSize(30);
+            text("play",200,200);
+            text("Kill beez with your bullets.\n Finish wave 20 and win",200,279);
+            if(mousePressed&&dist(mouseX,mouseY,200,200)<50){
+                scene="game";
+                textSize(15);
+            }
+        }
+        if(scene==="game"){
+            //println("01234567".slice(3,50));
+            //bulletSize=sin(score/1000)*100;
+            score++;
+            background(237, 237, 237);
+            if(wave===2){
+                mr=20;
+                bulletSize=20;
+            }
+            if(wave===3){
+                mr=3;
+                bulletSize=10;
+            }
+            if(wave===4){
+                mr=2;
+                bulletSize=10;
+            }
+            
+            if(wave===5){
+                mr=1;
+                bulletSize=7;
+                spray=5;
+            }
+            if(wave===6){
+                mr=1;
+                bulletSize=3;
+                spray=5;
+                bulletStrength=20;
+                healthRegen=0.05;
+            }
+            if(wave===7){
+                mr=4;
+                bulletSize=30;
+                spray=0;
+                bulletStrength=0;
+            }
+            
+            if(wave===9){
+                mr=100;
+                bulletSize=100;
+                spray=0;
+                bulletStrength=0;
+                
+            }
+            if(wave===10){
+                beeSize=7;
+                mr=5;
+            }
+            if(wave===12){
+                mr=3;
+                bulletSize=4;
+                spray=4;
+                bulletStrength=0;
+            }
+            if(wave===15){
+                damage=1.5;
+                mr=200;
+                bulletSize=50;
+                spray=0;
+                bulletStrength=0;
+                beeSize=9;
+            }
+            if(wave===17){
+                mr=7;
+                beeSize=12;//ddddddddd
+                bulletSize=3;
+                spray=0;
+                bulletStrength=0;
+                damage=1.7;
+                healthRegen=0.5;
+            }
+            if(wave===20){
+                beeSize=17;
+                healthRegen=-0.07;
+                damage=99;
+                
+            }//while(Infinity){};
+            // if(wave>20){
+            //     mr++;
+            //     bulletSize=3;
+            //     spray++;
+            //     if(bulletStrength>0){
+            //         bulletStrength--;
+            //     }
+            // }
+            if(wave===21){
+                noLoop();
+                background(55, 255, 0);
+                text("HOW THE HELL DID YOU GET HERE?\n you have won the game.\n",200,200);
+ 
+                
+            }
+            for(var i=0;i<l;i++){
+                
+                var ret=p[i].update(x,y,health,bullets,bulletSize);
+                if(ret===damage){
+                    health-=ret;
+                }
+                else if((typeof ret)==="string"){
+                    //println("ded");
+                    p.splice(i,1);
+                    l--;
+                    if(bulletStrength){
+                        bullets.splice(parseInt(ret,10),1);
+                    }
+                    //println(parseFloat(ret));
+                }else{
+                p[i].display();}
+            }
+            //player{
+            noStroke();
+            fill(29, 0, 250);
+            ellipse(x,y,10,10);
+            fill(51, 255, 0);
+            ellipse(x,y,7,7);
+            stroke(0, 0, 0);
+            //println(health);
+            //}
+            fill(255, 0, 0);
+            rect(0,0,health*4,10);
+            
+            fill(255, 0, 0); 
+            
+            var dx=x-mouseX;
+            var dy=y-mouseY;
+            var t=atan2(-dy,-dx);
+            if(kip){
+                if(keyCode===87){
+                    y-=2;
+                }
+                if(keyCode===65){
+                    x-=2;
+                }if(keyCode===83){
+                    y+=2;
+                }if(keyCode===68){
+                    x+=2;
+                }
+                
+            }
+            if(x>400){x=400;}
+            if(x<0){x=0;}
+            if(y>400){y=400;}
+            if(y<0){y=0;}
+            //kip=false;
+            if(score%mr===0){
+                var n=bulletStrength;
+                if(n===0){
+                    n=1;
+                }
+                for(var i=0;i<n;i++){
+                    bullets.push(new Bullet(x,y,-cos(t)*5*isShootingBulletsForward+random(-spray,spray),-sin(t)*5*isShootingBulletsForward+random(-spray,spray),bulletSize));
+                
+                }
+            }
+            for(var i=0;i<bullets.length;i++){
+                bullets[i].draw();
+                bullets[i].update();
+                if(bullets[i].pos.x<0||bullets[i].pos.x>400||bullets[i].pos.y<0||bullets[i].pos.x>400){
+                    bullets.splice(i,1);
+                }
+            }
+            if(health<100){
+                health+=healthRegen;
+            }
+            //println(bullets.length);
+            if(score%r===1){
+                //p.push(new Bee(p[floor(random(0,l))].x,p[floor(random(0,l))].y,100));
+                //l+=1;
+            }
+            if(keyPressed){
+                kip=true;
+            }
+            if(l===0){
+                //background(68, 255, 0);
+                //text("u win",200,200);
+                l+=lIncrement;
+                wave++;
+                for (var i=0;i<l;i++){
+        
+                    p[i]=new Bee(400/(l)*i,0,100);
+                }
+            }
+            
+            fill(13, 0, 255);
+            text("Score: "+score+" and wave: "+wave ,113,50);
+            
+            if(health<0){
+                background(255, 0, 0);
+                noLoop();
+                fill(255, 255, 255);
+                text("Score: "+score+" wave:"+wave,200,200);
+                noLoop();
+            
+            }
+        }
+    }catch(e){
         background(55, 255, 0);
-        text("HOW THE HELL DID YOU GET HERE?\n you have won the game.\n", 200, 200);
-      }
-
-      for (let i = 0; i < l; i++) {
-        let ret = p[i].update(x, y, health, bullets, bulletSize);
-        if (ret === damage) {
-          health -= ret;
-        } else if (typeof ret === "string") {
-          p.splice(i, 1);
-          l--;
-          if (bulletStrength) {
-            bullets.splice(parseInt(ret.slice(4), 10), 1);
-          }
-        } else {
-          p[i].display();
-        }
-      }
-
-      noStroke();
-      fill(29, 0, 250);
-      ellipse(x, y, 10, 10);
-      fill(51, 255, 0);
-      ellipse(x, y, 7, 7);
-      stroke(0, 0, 0);
-
-      fill(255, 0, 0);
-      rect(0, 0, health * 4, 10);
-
-      let dx = x - mouseX;
-      let dy = y - mouseY;
-      let t = atan2(-dy, -dx);
-      if (kip) {
-        if (keyIsDown(87)) {
-          y -= 2;
-        }
-        if (keyIsDown(65)) {
-          x -= 2;
-        }
-        if (keyIsDown(83)) {
-          y += 2;
-        }
-        if (keyIsDown(68)) {
-          x += 2;
-        }
-      }
-      x = constrain(x, 0, 400);
-      y = constrain(y, 0, 400);
-
-      if (score % mr === 0) {
-        let n = bulletStrength;
-        if (n === 0) {
-          n = 1;
-        }
-        for (let i = 0; i < n; i++) {
-          bullets.push(new Bullet(x, y, -cos(t) * 5 * isShootingBulletsForward + random(-spray, spray), -sin(t) * 5 * isShootingBulletsForward + random(-spray, spray), bulletSize));
-        }
-      }
-
-      for (let i = 0; i < bullets.length; i++) {
-        bullets[i].draw();
-        bullets[i].update();
-        if (bullets[i].pos.x < 0 || bullets[i].pos.x > 400 || bullets[i].pos.y < 0 || bullets[i].pos.y > 400) {
-          bullets.splice(i, 1);
-        }
-      }
-
-      if (health < 100) {
-        health += healthRegen;
-      }
-      
-      fill(13, 0, 255);
-      text("Score: " + score + " and wave: " + wave, 113, 50);
-      if (health < 0) {
-        background(255, 0, 0);
-        noLoop();
-        fill(255, 255, 255);
-        text("Score: " + score + " wave:" + wave, 200, 200);
-        noLoop();
-      }
+        textSize(15);
+        text("The program has encounterd a runtime error. \nThis is probalby because there are too many\n beez & bullets to be handeled.\n Sorry, pls screenshot and report: \n"+e+"\n Also, this is not suppost to be falshing or changing colors.\n It it is, this may be a sign of something. ",200,200);
     }
-  } catch (e) {
-    background(55, 255, 0);
-    text("The program has encountered a runtime error. \nThis is probably because there are too many\n beez & bullets to be handled.\n This also means...\n YOU HAVE WON!", 200, 200);
-  }
-}
-function keyPressed() {
-  if (keyCode === 87 || keyCode === 65 || keyCode === 83 || keyCode === 68) {
-    kip = true;
-  }
-}
+};
 
-function keyReleased() {
-  if (keyCode === 87 || keyCode === 65 || keyCode === 83 || keyCode === 68) {
-    kip = false;
-  }
-}
-</script>
+
+
+    </script>
+    
+    <!-- Fallback for browsers without canvas support -->
+    <noscript>
+        <p>JavaScript is required to view the contents of this page.</p>
+    </noscript>
 </body>
 </html>
-
