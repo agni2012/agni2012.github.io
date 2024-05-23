@@ -99,6 +99,12 @@
                     var changeNameCode=prompt("Nat so easy! If you want to change your name back, bring this computer to me so I can enter theis passcode: ");
                     if(changeNameCode == "__ingot__"){
                         alert("Ok!");
+                        var fullName = document.getElementById("input").value;
+                        window.localStorage.setItem("fname", fullName.split(" ")[0])
+                        window.localStorage.setItem("lname", fullName.split(" ")[1])
+                        window.localStorage.setItem("fullName", fullName)
+                    }else{
+                        alert("Nah for real");
                     }
                 }
                 
