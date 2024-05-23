@@ -67,12 +67,13 @@
         <a class="secrets" href="https://agni2012.github.io/secrets">Secrets</a>
         <hr>
         <p>
+            <p id="greeting"></p>
             Hi, I Am Agni Rammohan! <br>
             All my games are in the games section!<br>
             are you in 6th grade?<br>
             <p>
             Enter your first and last name here (When you beat a record or contact me I cannot see it): <br>
-            <input id="input">
+            <input id="input"><br>
             <button onClick="storeName()"> Done </button>
             </p>
             
@@ -80,10 +81,14 @@
         </p>
       
         <script>
+            if(window.localStorage.getItem("fname") !== null) {
+                document.getElementById("greeting").innerHTML="Hello " + window.localStorage.getItem("fname")+"!";
+            }
             function storeName(){
                 var fullName = document.getElementById("input").value;
                 window.localStorage.setItem("fname", fullName.split(" ")[0])
-                window.localStorage.setItem("fname", fullName.split(" ")[1])
+                window.localStorage.setItem("lname", fullName.split(" ")[1])
+                alert("Name Stored.");
             }
         </script>
     </body>
