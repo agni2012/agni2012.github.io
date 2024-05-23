@@ -66,6 +66,14 @@
       
         <a class="secrets" href="https://agni2012.github.io/secrets">Secrets</a>
         <hr>
+        <p id="greeting"></p>
+        <script>
+            function greet(){
+                if(window.localStorage.getItem("fname") != null) {
+                    document.getElementById("greeting").innerHTML="Hello " + window.localStorage.getItem("fname")+"!";
+                }
+            }
+        </script>
         <p>
             GAMESSSS:
             <p>
