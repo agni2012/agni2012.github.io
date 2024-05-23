@@ -70,26 +70,22 @@
             Hi, I Am Agni Rammohan! <br>
             All my games are in the games section!<br>
             are you in 6th grade?<br>
-            Sign In:<br>
-            <label for="uname">username:</label>
-            <input type="text" id="uname" name="uname"><br>
-            <label for="name">name:</label>
-            <input type="text" id="name" name="name"><br>
-            <button onClick="signIn()"></button>button>
-            No Account? <a href="https://agni2012.github.io/signup">click here</a>
+            <p>
+            Enter your first and last name here (When you beat a record or contact me I cannot see it): <br>
+            <input id="input">
+            <button onClick="storeName()"> Done </button>
+            </p>
             
-  
             
         </p>
+      
         <script>
-            function signIn(){
-                var name=document.getElementById("name").value;
-                var uname=document.getElementById("uname").value;
-                alert("Done, "+name);
+            function storeName(){
+                var fullName = document.getElementById("input").value;
+                window.localStorage.setItem("fname", fullName.split(" ")[0])
+                window.localStorage.setItem("fname", fullName.split(" ")[1])
             }
-            
         </script>
-        
     </body>
     
 </html>
