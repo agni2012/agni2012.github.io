@@ -81,14 +81,37 @@
         </p>
       
         <script>
-            if(window.localStorage.getItem("fname") !== null) {
-                document.getElementById("greeting").innerHTML="Hello " + window.localStorage.getItem("fname")+"!";
+            function greet(){
+                if(window.localStorage.getItem("fname") != null) {
+                    document.getElementById("greeting").innerHTML="Hello " + window.localStorage.getItem("fname")+"!";
+                }
             }
+            greet();
             function storeName(){
                 var fullName = document.getElementById("input").value;
                 window.localStorage.setItem("fname", fullName.split(" ")[0])
                 window.localStorage.setItem("lname", fullName.split(" ")[1])
+                window.localStorage.setItem("fullName", fullName)
                 alert("Name Stored.");
+                greet();
+                
+                if(window.localStorage.getItem("fname") != "Agni"){
+                    var fullName = document.getElementById("input").value;
+                    window.localStorage.setItem("fname", fullName.split(" ")[0])
+                    window.localStorage.setItem("lname", fullName.split(" ")[1])
+                    alert("Name Stored.");
+                    greet();
+                }else{
+                    var code=prompt("Ok then. If you really am Agni Rammohan, enter the passcode:")
+                    if(code == "__ingot__"){
+                        alert("All Clear!");
+                    }else{
+                        alert("Ok you are a scumbag. Your name is Evil_Impersonator The_Bad until I fix it for you!")
+                        var fullName = "Evil_Impersonator The_Bad"
+                        window.localStorage.setItem("fname", fullName.split(" ")[0])
+                        window.localStorage.setItem("lname", fullName.split(" ")[1])
+                    }
+                    
             }
         </script>
     </body>
