@@ -73,51 +73,17 @@
                 Anything to say?<br>
                 If you want me to reply, put your name so I know.
                 Type HERE:<p></p>
-                text: <input type="text" name="message"><br>
-                <button type="submit">Send</button><br>
+                text: <input type="text" name="message" id="input"><br>
+                <button type="submit" onClick="appendName()">Send</button><br>
                 
                 
                 if you win a record make sure you put the code and your name and your score!
         </form>
-        replies: 
-        your name for replies.
-        <input type="text" id="replyName">
-        <button onClick="proccesName();">submit</button>
-        <p id="replies"></p>
         <script>
-            function proccesName(){
-                var name=document.getElementById("replyName").value;
-                
-                switch(name){
-                    case "Agni":
-                        document.getElementById("replies").innerHTML="Hi AGNI!";
-                    break;
-                    case "Neer":
-                        document.getElementById("replies").innerHTML="Yes, ur suposed to code, not play snake";
-                    break;
-                    case "Theodora":
-                        document.getElementById("replies").innerHTML="Hi Theodora, I saw your message!";
-                    break;
-                    case "Jason":
-                        document.getElementById("replies").innerHTML="Ok. Immpresive scores Jason Au. Like my website?";
-                    break;  
-                    case "Radha":
-                        document.getElementById("replies").innerHTML="Ok good. (:";
-                    break;
-                    case "Lidia":
-                        document.getElementById("replies").innerHTML="privet mama.";
-                    break;
-                        
-                    case "Lydia":
-                        document.getElementById("replies").innerHTML="Hi Lydia. ";
-                    break;
-                    case "Kavin":
-                        document.getElementById("replies").innerHTML="KAVIN, I didn't replace your name because you didn't put your score in the message!";
-                    break;
-                    default:
-                       document.getElementById("replies").innerHTML="";                        
-                }
+            function appendName(){
+                document.getElementById("input").value = document.getElementById("input").value + " [SENT FROM: "+window.localStorage.getItem("fullName") +"]";
             }
+            
         </script>
                 
         </p>
