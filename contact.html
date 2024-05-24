@@ -80,6 +80,8 @@
             if you win a record make sure you put the code and your name and your score!
         </form>
         <script>
+            //Clear text box if coming back from /getform/
+            document.getElementById("input").value="";
             function greet(){
                 if(window.localStorage.getItem("fname") != null) {
                     document.getElementById("greeting").innerHTML="Hello " + window.localStorage.getItem("fname")+"!";
