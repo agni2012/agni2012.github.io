@@ -3,19 +3,12 @@
 <!DOCTYPE html>
 <html>
     EXPIRIMENT<br>
-    send php mail:
-    v0.10
+    send /fomr/ mail:
+    v0.2
+    <form action="mailto:agnirammohan@gmail.com" method="post" enctype="text/plain">
+         Student Name:<br><input type="text" name="sname"> <br>
+         Student Subject:<br><input type="text" name="ssubject"><br>
+         <input type="submit" value="Send">
+      </form>
 </html>
-    <?php
-    // The message
-    $message = "Eayallo!";
-    
-    // In case any of our lines are larger than 70 characters, we should use wordwrap()
-    $message = wordwrap($message, 70, "\r\n");
-    
-    // Send
-    mail('agnirammohan@gmail.com', 'OooopHs', $message);
-    ?>
-    
-
 
