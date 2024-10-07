@@ -43,7 +43,7 @@ document.addEventListener('keyup', function(event) {
     	isJumping=false;
     }
 });
-elements.You = {
+elements.hm = {
     color: ["#f5eac6","#d4c594","#a89160","#7a5733","#523018","#361e0e"],
     category: "life",
     properties: {
@@ -53,13 +53,13 @@ elements.You = {
     },
     tick: function(pixel) {
         if (isEmpty(pixel.x, pixel.y+1)) {
-            createPixel("your_body", pixel.x, pixel.y+1);
-            pixel.element = "your_head";
+            createPixel("b", pixel.x, pixel.y+1);
+            pixel.element = "h";
         }
         else if (isEmpty(pixel.x, pixel.y-1)) {
-            createPixel("your_head", pixel.x, pixel.y-1);
+            createPixel("h", pixel.x, pixel.y-1);
             pixelMap[pixel.x][pixel.y-1].color = pixel.color;
-            pixel.element = "your_body";
+            pixel.element = "b";
             pixel.color = pixelColorPick(pixel)
         }
         else {
@@ -68,7 +68,7 @@ elements.You = {
     },
 };
 
- //If pixelTicks%60 == 0, look left and right from the your_head 20 pixels.
+ //If pixelTicks%60 == 0, look left and right from the h 20 pixels.
  /*   If something favorable is found, set target to that pixel.
     If something unfavorable is found, set target to a few pixels in the opposite direction. Raise panic attribute.
     If nothing is found, set target to null.
@@ -81,7 +81,7 @@ elements.You = {
  Regulate temperature.
 */
 
-elements.your_body = {
+elements.b = {
     color: ["#049699","#638A61"],
     category: "life",
     hidden: true,
@@ -106,9 +106,9 @@ elements.your_body = {
     },
     tick: function(pixel) {
         if (tryMove(pixel, pixel.x, pixel.y+1)) { // Fall
-            if (!isEmpty(pixel.x, pixel.y-2, true)) { // Drag your_head down
+            if (!isEmpty(pixel.x, pixel.y-2, true)) { // Drag h down
                 var hpixel = pixelMap[pixel.x][pixel.y-2];
-                if (hpixel.element == "your_head") {
+                if (hpixel.element == "h") {
                     if (isEmpty(pixel.x, pixel.y-1)) {
                         movePixel(pixelMap[pixel.x][pixel.y-2], pixel.x, pixel.y-1);
                     }
@@ -130,14 +130,14 @@ elements.your_body = {
             return
         }
 
-        // Find the your_head
-        if (!isEmpty(pixel.x, pixel.y-1, true) && pixelMap[pixel.x][pixel.y-1].element == "your_head") {
-            var your_head = pixelMap[pixel.x][pixel.y-1];
-            if (your_head.dead) {//  If your_head is dead, kill your_body
-                pixel.dead = your_head.dead;
+        // Find the h
+        if (!isEmpty(pixel.x, pixel.y-1, true) && pixelMap[pixel.x][pixel.y-1].element == "h") {
+            var h = pixelMap[pixel.x][pixel.y-1];
+            if (h.dead) {//  If h is dead, kill b
+                pixel.dead = h.dead;
             }
         }
-        else { var your_head = null }
+        else { var h = null }
 
         if (isEmpty(pixel.x, pixel.y-1)) {
              //create blood if decapitated 10% chance
@@ -149,7 +149,7 @@ elements.your_body = {
                 }
             }
         }
-        else if (your_head == null) { return }
+        else if (h == null) { return }
         else if (true) { // Move 10% chance
 		    	
 		    pixel.dir=0;
@@ -180,7 +180,7 @@ elements.your_body = {
 		        var move = movesToTry.splice(Math.floor(Math.random() * movesToTry.length), 1)[0];
 		        if (isEmpty(pixel.x+move[0], pixel.y+move[1]-1)) {
 		            if (tryMove(pixel, pixel.x+move[0], pixel.y+move[1])) {
-		                movePixel(your_head, your_head.x+move[0], your_head.y+move[1]);
+		                movePixel(h, h.x+move[0], h.y+move[1]);
 		                break;
 		            }
 		        }
@@ -192,7 +192,7 @@ elements.your_body = {
 		if(isJumping){
 			isJumping=false;
 			
-			movePixel(your_head,your_head.x,your_head.y-1);
+			movePixel(h,h.x,h.y-1);
 			movePixel(pixel,pixel.x,pixel.y-1);
 		}
 		
@@ -204,7 +204,7 @@ elements.your_body = {
     },
 };
 
-elements.your_head = {
+elements.h = {
     color: ["#f5eac6","#d4c594","#a89160","#7a6433","#524018"],
     category: "life",
     hidden: true,
@@ -238,14 +238,14 @@ elements.your_head = {
             }
         }
 
-        // Find the your_body
-        if (!isEmpty(pixel.x, pixel.y+1, true) && pixelMap[pixel.x][pixel.y+1].element == "your_body") {
-            var your_body = pixelMap[pixel.x][pixel.y+1];
-            if (your_body.dead) {  //If your_body is dead, kill your_head
-                pixel.dead = your_body.dead;
+        // Find the b
+        if (!isEmpty(pixel.x, pixel.y+1, true) && pixelMap[pixel.x][pixel.y+1].element == "b") {
+            var b = pixelMap[pixel.x][pixel.y+1];
+            if (b.dead) {  //If b is dead, kill h
+                pixel.dead = b.dead;
             }
         }
-        else { var your_body = null }
+        else { var b = null }
 
         if (isEmpty(pixel.x, pixel.y+1)) {
             tryMove(pixel, pixel.x, pixel.y+1);
