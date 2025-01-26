@@ -58,21 +58,21 @@ Garret thinks "math" is a type of bamboo.<br>
 Yet somehow, he’s happy, content with his fate,<br>
 A carrot-like ferret who’s second to great! <br><br>-definetly me agni not chatGPT<br><br>The reasone my server crashed is that garret sent me 10 copies of a million digits of PI. My server got an error, it didnt crash tho yet, but it was 99% full. FOR NERDS: the error i got was <br><code>
 { Error: Request Entity Too Large<br>
-        at respond (/home/nodejs/server/node_modules/elasticsearch/src/lib/transport.js:307:15)<br>
-        at checkRespForFailure (/home/nodejs/server/node_modules/elasticsearch/src/lib/transport.js:266:7)<br>
-        at HttpConnector.<anonymous> (/home/nodejs/server/node_modules/elasticsearch/src/lib/connectors/http.js:159:7)<br>
-        at IncomingMessage.bound (/home/nodejs/server/node_modules/lodash/dist/lodash.js:729:21)<br>
-        at emitNone (events.js:111:20)<br>
-        at IncomingMessage.emit (events.js:208:7)<br>
-        at endReadableNT (_stream_readable.js:1056:12)<br>
-        at _combinedTickCallback (internal/process/next_tick.js:138:11)<br>
-        at process._tickCallback (internal/process/next_tick.js:180:9)<br>
-      status: 413,<br>
-      displayName: 'RequestEntityTooLarge',<br>
-      message: 'Request Entity Too Large',<br>
-      path: '/_bulk',<br>
-      query: {},<br>
-      body: '<large body here>'<br>
+  &emsp;      &emsp;at respond (/home/nodejs/server/node_modules/elasticsearch/src/lib/transport.js:307:15)<br>
+        &emsp;&emsp;at checkRespForFailure (/home/nodejs/server/node_modules/elasticsearch/src/lib/transport.js:266:7)<br>
+       &emsp; &emsp;at HttpConnector.<anonymous> (/home/nodejs/server/node_modules/elasticsearch/src/lib/connectors/http.js:159:7)<br>
+ &emsp;       &emsp;at IncomingMessage.bound (/home/nodejs/server/node_modules/lodash/dist/lodash.js:729:21)<br>
+       &emsp; &emsp;at emitNone (events.js:111:20)<br>
+ &emsp;       &emsp;&emsp;at IncomingMessage.emit (events.js:208:7)<br>
+   &emsp;     &emsp;at endReadableNT (_stream_readable.js:1056:12)<br>
+        &emsp;&emsp;at _combinedTickCallback (internal/process/next_tick.js:138:11)<br>
+  &emsp;      &emsp;at process._tickCallback (internal/process/next_tick.js:180:9)<br>
+      &emsp;status: 413,<br>
+      &emsp;displayName: 'RequestEntityTooLarge',<br>
+    &emsp;  message: 'Request Entity Too Large',<br>
+     &emsp; path: '/_bulk',<br>
+   &emsp;   query: {},<br>
+   &emsp;   body: '<large body here>'<br>
 }</code><br>
 By the way this is not MY error as i couldnt fint the exacte err code but its a similar error somebody else got for the same thing; so the directories will be different.
 <br>
