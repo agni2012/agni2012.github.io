@@ -24,11 +24,12 @@
       		color: red;
       		font-size: 20px;
       	}
+        body
     </style>
     <!--<meta http-equiv="refresh" content="0; url='https://evolving-loosely-leech.ngrok-free.app/home'" /> -->
     
   </head>
-  <body>
+  <body id="body">
     
     <h2>
       	Sorry Guys... 
@@ -36,11 +37,44 @@
      <p>
        Sorry for:<br>
        1. My TERRIBLE styling for this thing<br>
-       2. My website is down. Because i have reached some badnwidth limit because<br> SOMEBODY... (ahem <span><u>garret</u></span>) so now my tunneling and <i>[yap yap yap yap more yap and then... YAP]</i> ...so now i can host my website for a week.<br> If you wanted the games, you can visit them in <a href="https://agni2012.github.io/home">agni2012.github.io</a> however if you wanted the chat or contact or anything else im sorry.</p>
+       2. My website is down. Because i have reached some badnwidth limit because<br> SOMEBODY... (ahem <span onclick = "gerret_the_ferret();"><u>garret</u></span>) so now my tunneling and <i>[yap yap yap yap more yap and then... YAP]</i> ...so now i can host my website for a week.<br> If you wanted the games, you can visit them in <a href="https://agni2012.github.io/home">agni2012.github.io</a> however if you wanted the chat or contact or anything else im sorry.</p>
     <p>*If you didnt get it your supposed to CLICK on the <span><u>garret</u></span> abouve</p>
   	</body>
-    <script>
+    <script>r
+    function gerret_the_ferret(){
     	var currStr = "";
-        var targetStr = ""
+        var targetStr = `Garret the ferret who looks like a carrot,<br>
+He has a beret but forgot to wear it (weret).<br>
+He swings from the trees in a clumsy display,<br>
+An unintelligent primate just fumbling away.<br>
+
+He stares at the sky with his mouth open wide,<br>
+Confused by the clouds as they slowly glide.<br>
+Bananas confound him; he chews on the peel,<br>
+Garret the ferret just keeps it surreal.<br>
+
+His friends try to teach him, but what can they do?<br>
+Garret thinks "math" is a type of bamboo.<br>
+Yet somehow, he’s happy, content with his fate,<br>
+A carrot-like ferret who’s second to great! <br><br>-definetly me agni not chatGPT<br><br>im bored. lemme make a game (sorry its not here im still making it probly maybe not tho)`
+        var index=0;
+        var body = document.getElementById("body");
+        body.style.color="white";
+        function appendTextToBody(){
+        	currStr+=targetStr[index];
+            index++;
+        	body.innerHTML = currStr;
+            if(index>=targetStr.length){
+            	clearTextInterval();
+                
+            }
+        }
+        var iID=setInterval(appendTextToBody,25);
+        function clearTextInterval(){
+        	clearInterval(iID);
+        }
+        
+       }
+        
     </script>
 </html>
