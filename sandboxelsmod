@@ -272,7 +272,7 @@ if (!elements.blood.reactions) {
 
 
 
-"decay": {
+elements.decay= {
 	color: "#383645",
 	tool: function(pixel) {
 		
