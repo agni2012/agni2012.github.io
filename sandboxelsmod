@@ -272,8 +272,8 @@ if (!elements.blood.reactions) {
 
 
 
-elements.decay= {
-	color: "#383645",
+elements.decay = {
+	color: "#38364f",
 	tool: function(pixel) {
 		
 		var r = elements.unburn.reactions[pixel.element];
@@ -292,7 +292,7 @@ elements.decay= {
 		"grass": { elem2: "dirt" },
 		"flower": { elem2: "dirt" },
 	},
-	category: "special",
+	category: "tools",
 	excludeRandom: true,
-	desc: "Use on pixels to decay and olden the,."
+	desc: "Use on pixels to decay and olden them."
 },
