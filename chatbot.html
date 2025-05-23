@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Global Learning Chatbot</title>
+	<style>
+		body { font-family: sans-serif; background: #f0f0f0; padding: 20px; }
+		#chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; background: white; }
+		.user { color: blue; }
+		.bot { color: green; }
+	</style>
+</head>
+<body>
+	<h2>🌐 Cloud Chatbot</h2>
+	<div id="chat"></div>
+	<input id="input" type="text" placeholder="Say something..." />
+	<button onclick="send()">Send</button>
+
+	<script>
+	// jshint ignore: start
+	var BIN_ID = '682fbb3b8960c979a59fbf1a';
+	var API_KEY = '$2a$10$YhqS9kyRlGZ6q23rpoyhy.4fgWScJsuAdQHfgjA8BrX7iFdb/Qj92';
+	var DATABASE = {};
+	var expectingAnswer = false;
+	var lastQuestion = "";
+
+	function addMessage(who, msg) {
+		var chat = document.getElementById("chat");
+		var div = document.createElement("div");
+		div.className = who;
+		div.textContent = who + ": " + msg;
+		chat.appendChild(div);
+		chat.scrollTop = chat.scrollHeight;
+	}
+
+	function send() {
+		var input = document.getElementById("input");
+		var text = input.value.trim().toLowerCase();
+		if (!text) return;
+		addMessage("user", text);
+		input.value = "";
+
+		if (expectingAnswer) {
+			DATABASE[lastQuestion] = text;
+			updateDatabase();
+			addMessage("bot", "Got it. I'll remember that.");
+			expectingAnswer = false;
+			lastQuestion = "";
+		} else {
+			if (DATABASE[text]) {
+				addMessage("bot", DATABASE[text]);
+			} else {
+				addMessage("bot", "I don't know that. What should I say?");
+				expectingAnswer = true;
+				lastQuestion = text;
+			}
+		}
+	}
+
+	function loadDatabase() {
+		fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+			headers: { 'X-Master-Key': API_KEY }
+		})
+		.then(res => res.json())
+		.then(data => {
+			DATABASE = data.record;
+			addMessage("bot", "Loaded memory. Say something.");
+		})
+		.catch(err => {
+			console.error("Failed to load:", err);
+			addMessage("bot", "Error loading brain.");
+		});
+	}
+
+	function updateDatabase() {
+		fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+			method: "PUT",
+			headers: {
+				'Content-Type': 'application/json',
+				'X-Master-Key': API_KEY,
+				'X-Bin-Versioning': 'false'
+			},
+			body: JSON.stringify(DATABASE)
+		})
+		.then(res => res.json())
+		.then(() => console.log("Updated DB"))
+		.catch(err => console.error("Failed to update DB:", err));
+	}
+
+	loadDatabase();
+	</script>
+</body>
+</html>
