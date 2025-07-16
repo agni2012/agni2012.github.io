@@ -69,7 +69,7 @@ document.addEventListener("mousedown", (event) => {
             var cell = matrix[j][i];
             if (cell !== "#" && cell.element) {
             
-              var px = createPixel(cell.element, x + i, y + j);
+              var px = createPixel(cell.element, x + i - (size-1)/2, y + j - (size-1)/2);
               if (px) {
                 if (typeof cell.temp === "number") px.temp = cell.temp;
                 if (typeof cell.color === "string") px.color = cell.color;
