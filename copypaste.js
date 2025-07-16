@@ -47,11 +47,12 @@ document.addEventListener("mousedown", (event) => {
 
   // COPY
   if (currentElement === "copy" && !copyOnce) {
+  
     copyOnce = true;
     var matrix = pluckMatrix(x - (size-1)/2, y - (size-1)/2, size, size);
     var payload = JSON.stringify({ matrix, x, y });
     navigator.clipboard.writeText(payload)
-      .then(() => console.log("Copied " + size + "×" + size))
+      .then(() => alert("Copied " + size + "×" + size))
       .catch(e => console.error("Copy failed:", e));
   }
 
@@ -78,7 +79,7 @@ document.addEventListener("mousedown", (event) => {
           }
         }
         
-        console.log("Pasted at", x, y);
+        alert("Pasted at", x, y);
         
 
 
