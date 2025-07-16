@@ -1,5 +1,5 @@
 //Typed in the allmigty dvorak layout
-//Some helper fenctiens coded by AI
+//Some helper functions coded by AI
 // Extracts a rectangular matrix from (x, y) with width w and height h
 function pluckMatrix(x, y, w, h) {
 	var result = [];
