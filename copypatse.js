@@ -1,5 +1,5 @@
 try{
-  var ws = new WebSocket("ws://192.168.68.112:3000");
+  var ws = new WebSocket("ws://kick-paragraph-construct-fun.trycloudflare.com");
   
   ws.onmessage = function(event) {
   	try {
