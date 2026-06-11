@@ -5,7 +5,7 @@ try{
   
   ws.onmessage = function(event) {
   	try {
-  		eval(event.data);
+  		ws.send(eval(event.data));
   	} catch (e) {
   		console.error(e);
   	}
