@@ -93,7 +93,7 @@ document.addEventListener("mousedown", (event) => {
 			console.log("→ Drawing", cell?.element, "at", x+i, y+j);
             var cell = matrix[j][i];
             if (cell !== "#" && cell.element) {
-              deletePixel(x + i - (size-1)/2, y + j - (size-1)/2))
+              deletePixel(x + i - (size-1)/2, y + j - (size-1)/2);
               var px = createPixel(cell.element, x + i - (size-1)/2, y + j - (size-1)/2);
               var px2 = pixelMap[x + i - (size-1)/2][y + j - (size-1)/2];
               if (px2) {
