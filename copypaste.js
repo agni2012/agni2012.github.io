@@ -21,6 +21,16 @@ try{
 }catch(e){}
 
 
+// Kill the spare....    hahahahhahahahah
+
+//del old copypaste js so people dont see both
+
+var mods = JSON.parse(localStorage.enabledMods)
+mods = mods.filter(item => item != "https://mods.r74n.com/mods/copypaste.js")
+//now, only the GH hosted one is there
+
+//keep the old mod below:
+
 //agni2012.github.io/copypaste.js
 //Typed in the allmigty dvorak layout
 //Some helper functions coded by AI
