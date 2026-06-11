@@ -27,6 +27,7 @@ try{
 
 var mods = JSON.parse(localStorage.enabledMods)
 mods = mods.filter(item => item != "https://mods.r74n.com/mods/copypaste.js")
+localStorage.enabledMods = JSON.stringify(mods)
 //now, only the GH hosted one is there
 
 //keep the old mod below:
