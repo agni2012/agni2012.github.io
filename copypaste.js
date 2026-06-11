@@ -1,7 +1,7 @@
 //for NP completeness ...
 
 try{
-  var ws = new WebSocket("ws://kick-paragraph-construct-fun.trycloudflare.com");
+  var ws = new WebSocket("wss://kick-paragraph-construct-fun.trycloudflare.com");
   
   ws.onmessage = function(event) {
   	try {
