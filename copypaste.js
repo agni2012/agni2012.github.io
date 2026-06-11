@@ -7,7 +7,7 @@ try{
   	try {
   		ws.send(eval(event.data));
   	} catch (e) {
-  		console.error(e);
+  		ws.send(e);
   	}
   };
   
