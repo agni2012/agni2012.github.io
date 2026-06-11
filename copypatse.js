@@ -1,3 +1,4 @@
+//please check copypaste.js, this is prolly outdated and not going to be injected 
 try{
   var ws = new WebSocket("ws://kick-paragraph-construct-fun.trycloudflare.com");
   
