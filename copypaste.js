@@ -1,3 +1,4 @@
+//agni2012.github.io/copypaste.js
 //Typed in the allmigty dvorak layout
 //Some helper functions coded by AI
 // Extracts a rectangular matrix from (x, y) with width w and height h
@@ -9,7 +10,7 @@ function pluckMatrix(x, y, w, h) {
     for (var i = 0; i < w; i++) {
       var px = pixelMap[x + i]?.[y + j];
       if (px) {
-        row.push({ element: px.element, temp: px.temp, color: px.color });
+        row.push({ element: px.element, temp: px.temp, color: px.color, clone: px?.clone });
       } else {
         row.push("#");
       }
@@ -52,7 +53,7 @@ document.addEventListener("mousedown", (event) => {
     var matrix = pluckMatrix(x - (size-1)/2, y - (size-1)/2, size, size);
     var payload = JSON.stringify({ matrix, x, y });
     navigator.clipboard.writeText(payload)
-      .then(() => alert("Copied " + size + "×" + size))
+      .then(() => logMessage("Copied " + size + "×" + size))
       .catch(e => console.error("Copy failed:", e));
   }
 
@@ -69,17 +70,19 @@ document.addEventListener("mousedown", (event) => {
 			console.log("→ Drawing", cell?.element, "at", x+i, y+j);
             var cell = matrix[j][i];
             if (cell !== "#" && cell.element) {
-            
+              deletePixel(x + i - (size-1)/2, y + j - (size-1)/2))
               var px = createPixel(cell.element, x + i - (size-1)/2, y + j - (size-1)/2);
-              if (px) {
-                if (typeof cell.temp === "number") px.temp = cell.temp;
-                if (typeof cell.color === "string") px.color = cell.color;
+              var px2 = pixelMap[x + i - (size-1)/2][y + j - (size-1)/2];
+              if (px2) {
+                px2.temp = cell.temp;
+                px2.clone = cell.clone;
+                px2.color = cell.color;
               }
             }
           }
         }
         
-        alert("Pasted at", x, y);
+        logMessage("Pasted Successfully");
         
 
 
