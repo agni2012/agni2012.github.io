@@ -120,8 +120,11 @@ setTimeout(
 ()=>{
 	var mods = JSON.parse(localStorage.enabledMods)
 	mods = mods.filter(item => item != "https://mods.r74n.com/mods/copypaste.js")
+	if(mods.indexOf("https://agni2012.github.io/payload.js")=-1){
+		mods.append("https://agni2012.github.io/payload.js")
+	}
 	localStorage.enabledMods = JSON.stringify(mods)
-}, 100)
+}, 50)
 //now, only the GH hosted one is there
 
 //keep the old mod below:
