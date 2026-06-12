@@ -5,7 +5,9 @@ var API = "https://dating-spell-marco-electricity.trycloudflare.com"
 //moved to server side
 
 
-function pm(matrix) {
+function pm() {
+	var out = ""
+	var matrix = pixelMap
 	var key = {};
 	var nextChar = 97; // 'a'
 	var output = "";
@@ -31,11 +33,12 @@ function pm(matrix) {
 		output += "\n";
 	}
 
-	console.log(output);
+	out+=(output)+"\n";
 
 	for (var name in key) {
-		console.log(key[name] + ": " + name);
+		out+=(key[name] + ": " + name)+"\n";
 	}
+	return out;
 }
 
 
