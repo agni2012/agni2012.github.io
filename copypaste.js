@@ -12,9 +12,9 @@ function pm() {
 	var nextChar = 97; // 'a'
 	var output = "";
 
-	for (var y = 0; y < matrix.length; y++) {
-		for (var x = 0; x < matrix[y].length; x++) {
-			var cell = matrix[y][x];
+	for (var x = 0; x < matrix.length; x++) {
+		for (var y = 0; y < matrix[y].length; y++) {
+			var cell = matrix[x][y];
 
 			if (!cell) {
 				output += " ";
