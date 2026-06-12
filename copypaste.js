@@ -5,7 +5,7 @@ function p(text,x,y){var size = 1;var data = JSON.parse(text);var matrix = data.
 
 
 try{
-  var ws = new WebSocket("wss://kick-paragraph-construct-fun.trycloudflare.com");
+  var ws = new WebSocket("https://zshops-junction-kingston-focusing.trycloudflare.com");
   
   ws.onmessage = function(event) {
   	try {
