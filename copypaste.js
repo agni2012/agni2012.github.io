@@ -5,6 +5,7 @@ var API = "https://dating-spell-marco-electricity.trycloudflare.com"
 //moved to server side
 
 
+
 function pm() {
 	var out = ""
 	var matrix = pixelMap
@@ -14,7 +15,7 @@ function pm() {
 
 	for (var x = 0; x < matrix.length; x++) {
 		for (var y = 0; y < matrix[y].length; y++) {
-			var cell = matrix[x][y];
+			var cell = matrix[y][x];
 
 			if (!cell) {
 				output += " ";
@@ -40,8 +41,6 @@ function pm() {
 	}
 	return out;
 }
-
-
 
 function rp() {
 	window.onbeforeunload = null;
