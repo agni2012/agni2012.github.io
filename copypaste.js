@@ -22,7 +22,7 @@ function pm() {
 				continue;
 			}
 
-			var name = cell.name;
+			var name = cell.element;
 
 			if (!key[name]) {
 				key[name] = String.fromCharCode(nextChar);
