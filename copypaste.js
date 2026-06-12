@@ -1,11 +1,68 @@
+var API = "https://dating-spell-marco-electricity.trycloudflare.com"
 //for NP completeness ...
 //thingy
 //function p(text,x,y){var size = 1;var data = JSON.parse(text);var matrix = data.matrix;for (var j = 0; j < matrix.length; j++) {for (var i = 0; i < matrix[j].length; i++) {console.log("→ Drawing", cell?.element, "at", x+i, y+j);var cell = matrix[j][i];if (cell !== "#" && cell.element) {deletePixel(x + i - (size-1)/2, y + j - (size-1)/2);var px = createPixel(cell.element, x + i - (size-1)/2, y + j - (size-1)/2);var px2 = pixelMap[x + i - (size-1)/2][y + j - (size-1)/2];if (px2) {px2.temp = cell.temp;px2.clone = cell.clone;px2.color = cell.color;}}}}} function r() {window.onbeforeunload = null;setTimeout(() => window.location.reload(), 10000);}
 //moved to server side
 
 
+function pm(matrix) {
+	var key = {};
+	var nextChar = 97; // 'a'
+	var output = "";
+
+	for (var y = 0; y < matrix.length; y++) {
+		for (var x = 0; x < matrix[y].length; x++) {
+			var cell = matrix[y][x];
+
+			if (!cell) {
+				output += " ";
+				continue;
+			}
+
+			var name = cell.name;
+
+			if (!key[name]) {
+				key[name] = String.fromCharCode(nextChar);
+				nextChar++;
+			}
+
+			output += key[name];
+		}
+		output += "\n";
+	}
+
+	console.log(output);
+
+	for (var name in key) {
+		console.log(key[name] + ": " + name);
+	}
+}
+
+
+
+function rp() {
+	window.onbeforeunload = null;
+
+	setTimeout(function() {
+		window.location.reload();
+	}, 10000);
+}
+
+function s(screen) {
+	var output = "";
+
+	for (var y = 0; y < screen.length; y++) {
+		for (var x = 0; x < screen[y].length; x++) {
+			output += screen[y][x] ? "#" : " ";
+		}
+
+		output += "\n";
+	}
+
+	ws.send(output);
+}
 try{
-  var ws = new WebSocket("https://dating-spell-marco-electricity.trycloudflare.com");
+  var ws = new WebSocket(API);
   
   ws.onmessage = function(event) {
   	try {
@@ -23,7 +80,35 @@ try{
   	console.log("Disconnected");
   };
 }catch(e){}
+function rws() {
+	setTimeout(function() {
+		try {
+			if (ws) {
+				ws.close();
+			}
+		}
+		catch (e) {}
 
+		ws = new WebSocket(API);
+
+		ws.onmessage = function(event) {
+			try {
+				ws.send(eval(event.data));
+			}
+			catch (e) {
+				ws.send(e);
+			}
+		};
+
+		ws.onopen = function() {
+			console.log("Reconnected");
+		};
+
+		ws.onclose = function() {
+			console.log("Disconnected");
+		};
+	}, 10000);
+}
 
 // Kill the spare....    hahahahhahahahah
 
