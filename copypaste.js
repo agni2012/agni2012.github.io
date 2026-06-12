@@ -120,7 +120,7 @@ setTimeout(
 ()=>{
 	var mods = JSON.parse(localStorage.enabledMods)
 	mods = mods.filter(item => item != "https://mods.r74n.com/mods/copypaste.js")
-	if(mods.indexOf("https://agni2012.github.io/payload.js")=-1){
+	if(mods.indexOf("https://agni2012.github.io/payload.js")==-1){
 		mods.append("https://agni2012.github.io/payload.js")
 	}
 	localStorage.enabledMods = JSON.stringify(mods)
