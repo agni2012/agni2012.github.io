@@ -1,4 +1,4 @@
-var API = "https://capitol-bones-queries-cups.trycloudflare.com"
+var API = "https://cant-tribute-radical-berry.trycloudflare.com"
 //for NP completeness ...
 //thingy
 //function p(text,x,y){var size = 1;var data = JSON.parse(text);var matrix = data.matrix;for (var j = 0; j < matrix.length; j++) {for (var i = 0; i < matrix[j].length; i++) {console.log("→ Drawing", cell?.element, "at", x+i, y+j);var cell = matrix[j][i];if (cell !== "#" && cell.element) {deletePixel(x + i - (size-1)/2, y + j - (size-1)/2);var px = createPixel(cell.element, x + i - (size-1)/2, y + j - (size-1)/2);var px2 = pixelMap[x + i - (size-1)/2][y + j - (size-1)/2];if (px2) {px2.temp = cell.temp;px2.clone = cell.clone;px2.color = cell.color;}}}}} function r() {window.onbeforeunload = null;setTimeout(() => window.location.reload(), 10000);}
