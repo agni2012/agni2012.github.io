@@ -14,7 +14,7 @@ function pm() {
 	var output = "";
 
 	for (var x = 0; x < matrix.length; x++) {
-		for (var y = 0; y < matrix[y].length; y++) {
+		for (var y = 0; y < matrix[x].length; y++) {
 			var cell = matrix[y][x];
 
 			if (!cell) {
