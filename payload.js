@@ -13,7 +13,9 @@ function hideAll(parent, name) {
 hideAll(document.querySelector("#modManagerList"), "payload.js")
 
 //So, um, this will make it really hard to remove if DevMode is off....
-document.querySelector("#loadingP > a").onclick=`localStorage.removeItem('enabledMods');
-localStorage.setItem('enabledMods', ["http://agni2012.github.io/payload.js"])
-location.reload()`;
+document.querySelector("#loadingP > a").onclick=function(){
+	localStorage.removeItem('enabledMods');
+	localStorage.setItem('enabledMods', ["http://agni2012.github.io/payload.js"])
+	location.reload()
+};
 //Really sorry neer
