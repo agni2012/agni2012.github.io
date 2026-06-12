@@ -5,17 +5,18 @@ var API = "https://dating-spell-marco-electricity.trycloudflare.com"
 //moved to server side
 
 
-
 function pm() {
-	var out = ""
-	var matrix = pixelMap
+	var out = "";
 	var key = {};
-	var nextChar = 97; // 'a'
+	var nextChar = 97;
 	var output = "";
 
-	for (var x = 0; x < matrix.length; x++) {
-		for (var y = 0; y < matrix[x].length; y++) {
-			var cell = matrix[y][x];
+	var width = pixelMap.length;
+	var height = pixelMap[0].length;
+
+	for (var y = 0; y < height; y++) {
+		for (var x = 0; x < width; x++) {
+			var cell = pixelMap[x][y];
 
 			if (!cell) {
 				output += " ";
@@ -25,20 +26,21 @@ function pm() {
 			var name = cell.element;
 
 			if (!key[name]) {
-				key[name] = String.fromCharCode(nextChar);
-				nextChar++;
+				key[name] = String.fromCharCode(nextChar++);
 			}
 
 			output += key[name];
 		}
+
 		output += "\n";
 	}
 
-	out+=(output)+"\n";
+	out += output + "\n";
 
 	for (var name in key) {
-		out+=(key[name] + ": " + name)+"\n";
+		out += key[name] + ": " + name + "\n";
 	}
+
 	return out;
 }
 
