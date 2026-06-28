@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+	<style>
+		body { margin: 0; overflow: hidden; background: black; }
+		canvas { display: block; }
+
+		#ui {
+			position: fixed;
+			bottom: 10px;
+			left: 10px;
+			display: flex;
+			gap: 8px;
+			flex-wrap: wrap;
+		}
+
+		button {
+			padding: 10px;
+			font-size: 14px;
+		}
+	</style>
+</head>
+<body>
+
+<div id="ui">
+	<button onclick="togglePlayback()">R (Replay)</button>
+	<button onclick="stepBack()">‹</button>
+	<button onclick="stepForward()">›</button>
+	<button onclick="togglePlay()">Play</button>
+	<button onclick="saveFit()">Fit</button>
+</div>
+
+<script>
+
+var pitch1 = {a:0, b:0, c:0};
+var s = 10;
+var balls = [];
+
+let frames = [];
+let maxFrames = 600;
+
+let lastTime = -1;
+let frameNum = 0;
+
+let playbackMode = false;
+let playing = false;
+
+let cam;
+
+function setup() {
+	createCanvas(windowWidth, windowHeight);
+	initCam();
+}
+
+function windowResized() {
+	resizeCanvas(windowWidth, windowHeight);
+}
+
+function draw() {
+	if (!playbackMode) {
+		recordFrame();
+	} else {
+		playFrames();
+	}
+}
+
+function initCam() {
+	cam = createCapture(VIDEO);
+	cam.size(640, 480);
+	cam.hide();
+}
+
+function recordFrame() {
+	image(cam, 0, 0, width, height);
+
+	if (cam.elt.currentTime !== lastTime) {
+		lastTime = cam.elt.currentTime;
+
+		frames.push(cam.get());
+
+		if (frames.length > maxFrames) {
+			frames.shift();
+		}
+	}
+}
+
+function parabola(a,b,c){
+	return (x)=>a*x*x + b*x + c;
+}
+
+function playFrames() {
+	if (frames.length === 0) return;
+
+	image(frames[frameNum], 0, 0, width, height);
+
+	if (playing) {
+		frameNum++;
+		loopFrame();
+	}
+
+	for (let i = 0; i < balls.length; i++) {
+		balls[i].draw();
+	}
+
+	strokeWeight(3);
+	stroke(255,0,0);
+
+	let par = parabola(pitch1.a, pitch1.b, pitch1.c);
+
+	for (let i = 0; i < width; i += s) {
+		let x = i;
+		let y = par(x);
+		line(x, y, x - s, par(x - s));
+	}
+}
+
+function loopFrame() {
+	if (frames.length === 0) return;
+
+	if (frameNum < 0) frameNum = frames.length - 1;
+	if (frameNum >= frames.length) frameNum = 0;
+}
+
+// touch = click
+function mousePressed(){
+	if (playbackMode) {
+		let shift = keyIsDown(SHIFT);
+		balls.push(new Ball(mouseX, mouseY, frameNum, shift));
+	}
+}
+
+/* ---------- UI CONTROLS ---------- */
+
+function togglePlayback() {
+	playbackMode = true;
+}
+
+function togglePlay() {
+	playing = !playing;
+}
+
+function stepForward() {
+	frameNum++;
+	loopFrame();
+}
+
+function stepBack() {
+	frameNum--;
+	loopFrame();
+}
+
+function saveFit() {
+	let points = balls.map(b => [b.screenX, b.screenY]);
+	if (points.length >= 3) {
+		pitch1 = fitParabola(points[0], points[1], points[2]);
+	}
+}
+
+/* ---------- BALLS ---------- */
+
+function Ball(screenX, screenY, frameNum, isPitch){
+	this.screenX = screenX;
+	this.screenY = screenY;
+	this.frameNum = frameNum;
+	this.isPitch = isPitch;
+}
+
+Ball.prototype.draw = function(){
+	if (!this.isPitch) {
+		fill(frameNum == this.frameNum ? color(255,0,0) : 0);
+	} else {
+		fill(frameNum == this.frameNum ? color(255,0,0) : color(0,255,0));
+	}
+	noStroke();
+	ellipse(this.screenX, this.screenY, 30, 30);
+};
+
+/* ---------- PARABOLA FIT ---------- */
+
+function fitParabola(p1, p2, p3) {
+	let [x1,y1] = p1;
+	let [x2,y2] = p2;
+	let [x3,y3] = p3;
+
+	let d = (x1-x2)*(x1-x3)*(x2-x3);
+
+	let a = (x3*(y2-y1) + x2*(y1-y3) + x1*(y3-y2)) / d;
+	let b = (x3*x3*(y1-y2) + x2*x2*(y3-y1) + x1*x1*(y2-y3)) / d;
+	let c = (x2*x3*(x2-x3)*y1 + x3*x1*(x3-x1)*y2 + x1*x2*(x1-x2)*y3) / d;
+
+	return {a,b,c};
+}
+
+</script>
+
+</body>
+</html>
