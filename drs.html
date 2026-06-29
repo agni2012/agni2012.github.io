@@ -3,59 +3,94 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
-	<style>
-		body { margin: 0; overflow: hidden; background: black; }
-		canvas { display: block; }
 
-		#ui {
-			position: fixed;
-			bottom: 10px;
-			left: 10px;
-			display: flex;
-			gap: 8px;
-			flex-wrap: wrap;
-		}
-
-		button {
-			padding: 10px;
-			font-size: 14px;
-		}
-	</style>
 </head>
 <body>
 
-<div id="ui">
-	<button onclick="togglePlayback()">R (Replay)</button>
-	<button onclick="stepBack()">‹</button>
-	<button onclick="stepForward()">›</button>
-	<button onclick="togglePlay()">Play</button>
-	<button onclick="saveFit()">Fit</button>
-</div>
+
 
 <script>
 
-var pitch1 = {a:0, b:0, c:0};
+let editMode = true; // true = LBW tracing, false = Pan/Zoom
+
+let zoom = 1;
+let panX = 0;
+let panY = 0;
+
+let lastTouchDist = 0;
+let dragging = false;
+
+var pitch1 = {a:0, b:0, c:0} //a,b,c
+var pitch2 = {a:0, b:0, c:0} //a,b,c, beta
 var s = 10;
-var balls = [];
+var balls=[];
 
 let frames = [];
-let maxFrames = 600;
-
+let bufferSeconds = 10;
+let maxFrames = 0;
+let bufferInput;
+let bufferLabel;
 let lastTime = -1;
-let frameNum = 0;
 
+let frameNum = 0;
 let playbackMode = false;
 let playing = false;
 
-let cam;
-
+let btnRecord;
+let btnFit;
+let btnPrev;
+let btnNext;
+let btnPlay;
+let btnMode;
+let btnClear;
 function setup() {
-	createCanvas(windowWidth, windowHeight);
+	createCanvas(640, 480);
 	initCam();
-}
 
-function windowResized() {
-	resizeCanvas(windowWidth, windowHeight);
+bufferLabel = createSpan("Buffer (s): ");
+
+bufferInput = createInput("10");
+bufferInput.size(50);
+
+bufferInput.input(function () {
+	let t = parseFloat(bufferInput.value());
+	if (!isNaN(t) && t > 0) {
+		bufferSeconds = t;
+	}
+});
+  	btnRecord = createButton("Review");
+	btnRecord.mousePressed(startPlayback);
+
+	btnFit = createButton("Fit");
+	btnFit.mousePressed(fitTrajectory);
+
+	btnPrev = createButton("◀");
+	btnPrev.mousePressed(prevFrame);
+
+	btnNext = createButton("▶");
+	btnNext.mousePressed(nextFrame);
+
+	btnPlay = createButton("Play");
+	btnPlay.mousePressed(togglePlay);
+
+	btnMode = createButton("Pan/Zoom");
+	btnMode.mousePressed(toggleMode);
+
+	btnClear = createButton("Clear");
+	btnClear.mousePressed(function(){
+		balls = [];
+	});
+
+	let buttons = [
+		btnRecord, btnFit, btnPrev,
+		btnPlay, btnNext,
+		btnMode, btnClear
+	];
+
+	for(let i=0;i<buttons.length;i++){
+		buttons[i].style("font-size","20px");
+		buttons[i].style("margin","5px");
+	}
 }
 
 function draw() {
@@ -67,133 +102,263 @@ function draw() {
 }
 
 function initCam() {
-	cam = createCapture(VIDEO);
+      cam = createCapture({
+    	video: {
+    		facingMode: { ideal: "environment" },
+    	},
+    	audio: false
+    });
 	cam.size(640, 480);
 	cam.hide();
+  
 }
 
 function recordFrame() {
-	image(cam, 0, 0, width, height);
+	image(cam, 0, 0);
 
 	if (cam.elt.currentTime !== lastTime) {
 		lastTime = cam.elt.currentTime;
 
 		frames.push(cam.get());
 
-		if (frames.length > maxFrames) {
-			frames.shift();
-		}
-	}
-}
+let fps = cam.elt.getVideoPlaybackQuality ?
+	cam.elt.getVideoPlaybackQuality().totalVideoFrames / cam.elt.currentTime :
+	30;
 
+maxFrames = Math.max(1, Math.round(bufferSeconds * fps));
+
+while (frames.length > maxFrames) {
+	frames.shift();
+}
+	}
+
+  fill(255);
+stroke(0);
+
+let duration = frames.length / (maxFrames / bufferSeconds);
+
+text(
+	"Buffer: " +
+	duration.toFixed(1) +
+	" / " +
+	bufferSeconds.toFixed(1) +
+	" s",
+	10,
+	20
+);
+}
 function parabola(a,b,c){
-	return (x)=>a*x*x + b*x + c;
+  return (x)=>a*x*x+b*x+c;
 }
-
 function playFrames() {
-	if (frames.length === 0) return;
+  push();
 
-	image(frames[frameNum], 0, 0, width, height);
+translate(panX, panY);
+scale(zoom);
 
-	if (playing) {
-		frameNum++;
-		loopFrame();
+image(frames[frameNum], 0, 0);
+
+for (var i = 0; i < balls.length; i++) {
+	balls[i].draw();
+}
+
+strokeWeight(3 / zoom);
+stroke(255,0,0,100);
+
+var par = parabola(pitch1.a,pitch1.b,pitch1.c);
+
+for(var i=0;i<width;i+=s){
+  
+	line(i,par(i),i-s,par(i-s));
+}
+
+pop();
+if (playing) {
+	frameNum++;
+	loopFrame();
+}
+}
+function toImage(x,y){
+	return {
+		x:(x-panX)/zoom,
+		y:(y-panY)/zoom
+	};
+}
+
+function keyPressed(){
+	if(key=="r") startPlayback();
+	if(key=="s") fitTrajectory();
+	if(key==".") nextFrame();
+	if(key==",") prevFrame();
+	if(key==" ") togglePlay();
+}
+
+
+function mouseClicked(){
+	if(!playbackMode || !editMode) return;
+	if(mouseX < 0 || mouseX > width ||
+	   mouseY < 0 || mouseY > height){
+		return;
 	}
 
-	for (let i = 0; i < balls.length; i++) {
-		balls[i].draw();
-	}
+	var p = toImage(mouseX,mouseY);
 
-	strokeWeight(3);
-	stroke(255,0,0);
+	var shiftPressed = keyIsPressed && keyCode==16;
 
-	let par = parabola(pitch1.a, pitch1.b, pitch1.c);
+	balls.push(new Ball(p.x,p.y,frameNum,shiftPressed));
+}
+function mouseDragged(){
+	if(editMode) return;
 
-	for (let i = 0; i < width; i += s) {
-		let x = i;
-		let y = par(x);
-		line(x, y, x - s, par(x - s));
+	panX += movedX;
+	panY += movedY;
+}
+function mouseWheel(event){
+	if(editMode) return;
+
+	let factor = event.delta > 0 ? 0.9 : 1.1;
+
+	let ix = (mouseX-panX)/zoom;
+	let iy = (mouseY-panY)/zoom;
+
+	zoom *= factor;
+
+	panX = mouseX - ix*zoom;
+	panY = mouseY - iy*zoom;
+
+	return false;
+}
+
+
+function startPlayback(){
+	playbackMode = true;
+}
+
+function fitTrajectory(){
+	if(balls.length >= 3){
+		var points = balls.map(b => [b.screenX,b.screenY]);
+		pitch1 = calcBestFit(points);
 	}
 }
+
+function prevFrame(){
+	frameNum--;
+	loopFrame();
+}
+
+function nextFrame(){
+	frameNum++;
+	loopFrame();
+}
+
+function togglePlay(){
+	playing = !playing;
+	btnPlay.html(playing ? "Pause" : "Play");
+}
+
+function toggleMode(){
+	editMode = !editMode;
+	btnMode.html(editMode ? "Pan/Zoom" : "Trace");
+}
+function touchMoved(){
+	if(editMode) return;
+
+	if(touches.length==1){
+		panX += touches[0].x-pmouseX;
+		panY += touches[0].y-pmouseY;
+	}
+	else if(touches.length==2){
+		let dx = touches[0].x-touches[1].x;
+		let dy = touches[0].y-touches[1].y;
+
+		let d = sqrt(dx*dx+dy*dy);
+
+		if(lastTouchDist!=0){
+			zoom *= d/lastTouchDist;
+		}
+
+		lastTouchDist = d;
+	}
+
+	return false;
+}
+
+function touchEnded(){
+	lastTouchDist = 0;
+}
+function Ball(screenX, screenY, frameNum, isPitch){
+  this.screenX = screenX;
+  this.screenY = screenY;
+  this.frameNum = frameNum;
+  this.isPitch = isPitch;
+}
+Ball.prototype.draw = function(){
+  if(!this.isPitch){
+    if(frameNum == this.frameNum) fill(255,0,0);
+    else fill(0)
+    
+    ellipse(this.screenX, this.screenY, 30, 30);
+  }else{
+    fill(0,255,0);
+    
+    if(frameNum == this.frameNum) fill(255,0,0);
+    ellipse(this.screenX, this.screenY, 30, 30);
+  }
+}
+function fitParabola(p1, p2, p3) {
+	var x1 = p1[0], y1 = p1[1];
+	var x2 = p2[0], y2 = p2[1];
+	var x3 = p3[0], y3 = p3[1];
+
+	var d =
+		(x1 - x2) *
+		(x1 - x3) *
+		(x2 - x3);
+
+
+
+	var a =
+		(x3 * (y2 - y1) +
+		 x2 * (y1 - y3) +
+		 x1 * (y3 - y2)) / d;
+
+	var b =
+		(x3*x3 * (y1 - y2) +
+		 x2*x2 * (y3 - y1) +
+		 x1*x1 * (y2 - y3)) / d;
+
+	var c =
+		(x2*x3*(x2 - x3) * y1 +
+		 x3*x1*(x3 - x1) * y2 +
+		 x1*x2*(x1 - x2) * y3) / d;
+
+	return {a: a, b: b, c: c};
+}
+
+
+function calcBestFit(points){
+  return fitParabola(points[0], points[1], points[2]);
+}
+
+function calcErr(par, points) {
+	var err = 0;
+
+	for (var i = 0; i < points.length; i++) {
+		var dx = points[i][1] - par(points[i][0]);
+		err += dx * dx;
+	}
+
+	return err;
+}
+
+
 
 function loopFrame() {
 	if (frames.length === 0) return;
 
 	if (frameNum < 0) frameNum = frames.length - 1;
 	if (frameNum >= frames.length) frameNum = 0;
-}
-
-// touch = click
-function mousePressed(){
-	if (playbackMode) {
-		let shift = keyIsDown(SHIFT);
-		balls.push(new Ball(mouseX, mouseY, frameNum, shift));
-	}
-}
-
-/* ---------- UI CONTROLS ---------- */
-
-function togglePlayback() {
-	playbackMode = true;
-}
-
-function togglePlay() {
-	playing = !playing;
-}
-
-function stepForward() {
-	frameNum++;
-	loopFrame();
-}
-
-function stepBack() {
-	frameNum--;
-	loopFrame();
-}
-
-function saveFit() {
-	let points = balls.map(b => [b.screenX, b.screenY]);
-	if (points.length >= 3) {
-		pitch1 = fitParabola(points[0], points[1], points[2]);
-	}
-}
-
-/* ---------- BALLS ---------- */
-
-function Ball(screenX, screenY, frameNum, isPitch){
-	this.screenX = screenX;
-	this.screenY = screenY;
-	this.frameNum = frameNum;
-	this.isPitch = isPitch;
-}
-
-Ball.prototype.draw = function(){
-	if (!this.isPitch) {
-		fill(frameNum == this.frameNum ? color(255,0,0) : 0);
-	} else {
-		fill(frameNum == this.frameNum ? color(255,0,0) : color(0,255,0));
-	}
-	noStroke();
-	ellipse(this.screenX, this.screenY, 30, 30);
-};
-
-/* ---------- PARABOLA FIT ---------- */
-
-function fitParabola(p1, p2, p3) {
-	let [x1,y1] = p1;
-	let [x2,y2] = p2;
-	let [x3,y3] = p3;
-
-	let d = (x1-x2)*(x1-x3)*(x2-x3);
-
-	let a = (x3*(y2-y1) + x2*(y1-y3) + x1*(y3-y2)) / d;
-	let b = (x3*x3*(y1-y2) + x2*x2*(y3-y1) + x1*x1*(y2-y3)) / d;
-	let c = (x2*x3*(x2-x3)*y1 + x3*x1*(x3-x1)*y2 + x1*x2*(x1-x2)*y3) / d;
-
-	return {a,b,c};
-}
-
-</script>
+}</script>
 
 </body>
 </html>
