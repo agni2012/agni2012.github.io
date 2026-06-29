@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html>
-<head>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<html lang="en">
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/addons/p5.sound.min.js"></script>
+    
+    
+    
+    <meta charset="utf-8" />
 
-</head>
-<body>
-
-
-
-<script>
-
+  </head>
+  <body>
+    <main>
+    </main>
+    <script>
 let editMode = true; // true = LBW tracing, false = Pan/Zoom
 
 let zoom = 1;
@@ -95,8 +97,7 @@ bufferInput.input(function () {
 }
 
 function draw() {
-		
-	  frameRate(24);
+  frameRate(24);
 	if (!playbackMode) {
 		recordFrame();
 	} else {
@@ -403,9 +404,6 @@ function loopFrame() {
 
 	if (frameNum < 0) frameNum = frames.length - 1;
 	if (frameNum >= frames.length) frameNum = 0;
-}
-
-</script>
-
-</body>
+}</script>
+  </body>
 </html>
