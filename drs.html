@@ -56,7 +56,8 @@ let btnPlay;
 let btnMode;
 let btnClear;
 function setup() {
-	createCanvas(640, 480);
+pixelDensity(window.devicePixelRatio);
+	createCanvas(windowWidth, windowHeight);
 	initCam();
 
 bufferLabel = createSpan("Buffer (s): ");
@@ -115,18 +116,33 @@ function draw() {
 
 function initCam() {
       cam = createCapture({
-    	video: {
-    		facingMode: { ideal: "environment" },
-    	},
+	video:{
+		facingMode:{ideal:"environment"},
+		width:{ideal:99999},
+		height:{ideal:99999}
+	},
     	audio: false
     });
-	cam.size(640, 480);
+
 	cam.hide();
   
 }
 
 function recordFrame() {
-	image(cam, 0, 0);
+  
+  let scale = min(width/cam.width, height/cam.height);
+
+let w = cam.width * scale;
+let h = cam.height * scale;
+
+image(
+	cam,
+	(width-w)/2,
+	(height-h)/2,
+	w,
+	h
+);
+  
 
 	if (cam.elt.currentTime !== lastTime) {
 		lastTime = cam.elt.currentTime;
@@ -286,7 +302,32 @@ function touchMoved(){
 		let d = sqrt(dx*dx+dy*dy);
 
 		if(lastTouchDist!=0){
-			zoom *= d/lastTouchDist;
+          let x1 = touches[0].x;
+let y1 = touches[0].y;
+
+let x2 = touches[1].x;
+let y2 = touches[1].y;
+
+let cx = (x1+x2)/2;
+let cy = (y1+y2)/2;
+
+let dx = x1-x2;
+let dy = y1-y2;
+
+let d = sqrt(dx*dx+dy*dy);
+
+if(lastTouchDist!=0){
+
+	let ix = (cx-panX)/zoom;
+	let iy = (cy-panY)/zoom;
+
+	zoom *= d/lastTouchDist;
+
+	panX = cx - ix*zoom;
+	panY = cy - iy*zoom;
+}
+
+lastTouchDist = d;
 		}
 
 		lastTouchDist = d;
