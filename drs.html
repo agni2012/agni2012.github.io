@@ -137,8 +137,10 @@ image(
 
 	if (cam.elt.currentTime !== lastTime) {
 		lastTime = cam.elt.currentTime;
-
-		frames.push(cam.get());
+let img = createImage(cam.width, cam.height);
+img.copy(cam, 0, 0, cam.width, cam.height,
+              0, 0, cam.width, cam.height);
+frames.push(img);
 
 let fps = cam.elt.getVideoPlaybackQuality ?
 	cam.elt.getVideoPlaybackQuality().totalVideoFrames / cam.elt.currentTime :
