@@ -13,6 +13,7 @@
     <main>
     </main>
     <script>
+
 var startMs = Date.now(); //done again at end of setup() to avoid counting time before camera ready
 var framesMs = [];
 var cam;
@@ -162,11 +163,15 @@ function drawRects() {
         for (let i = 0; i < rects.length; i++) {
             let r = rects[i];
             rect(r[0], r[1], r[2], r[3]);
+            line(r[0], r[1], r[0] + r[2], r[1] + r[3]);
+            line(r[0] + r[2], r[1], r[0], r[1] + r[3]);
         }
 
         if (currentRect && currentRect.length == 4) {
             let r = currentRect;
             rect(r[0], r[1], r[2], r[3]);
+            line(r[0], r[1], r[0] + r[2], r[1] + r[3]);
+            line(r[0] + r[2], r[1], r[0], r[1] + r[3]);
         }
         return;
     }
@@ -180,6 +185,8 @@ function drawRects() {
         let sw = r[2] * scale;
         let sh = r[3] * scale;
         rect(sx, sy, sw, sh);
+        line(sx, sy, sx + sw, sy + sh);
+        line(sx + sw, sy, sx, sy + sh);
     }
 
     if (currentRect && currentRect.length == 4) {
@@ -189,6 +196,8 @@ function drawRects() {
         let sw = r[2] * scale;
         let sh = r[3] * scale;
         rect(sx, sy, sw, sh);
+        line(sx, sy, sx + sw, sy + sh); 
+        line(sx + sw, sy, sx, sy + sh);
     }
 }
 function initCam() {
@@ -569,4 +578,3 @@ function loopFrame() {
 </script>
   </body>
 </html>
-
