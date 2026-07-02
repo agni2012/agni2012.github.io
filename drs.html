@@ -13,6 +13,22 @@
     <main>
     </main>
     <script>
+var startMs = Date.now(); //done again at end of setup() to avoid counting time before camera ready
+var framesMs = [];
+var cam;
+var rects = []; // form of [x,y,w,h];
+var rectMode = false;
+function frameHash() {
+    cam.loadPixels();
+
+    let h = 0;
+
+    for (let i = 0; i < cam.pixels.length; i += 512) {
+        h = (h * 31 + cam.pixels[i]) >>> 0;
+    }
+
+    return h;
+}
 let editMode = true; // true = LBW tracing, false = Pan/Zoom
 
 let zoom = 1;
@@ -22,17 +38,25 @@ let panY = 0;
 let lastTouchDist = 0;
 let dragging = false;
 
-var pitch1 = {a:0, b:0, c:0} //a,b,c
-var pitch2 = {a:0, b:0, c:0} //a,b,c, beta
+var pitch1 = {
+        a: 0,
+        b: 0,
+        c: 0
+    } //a,b,c
+var pitch2 = {
+        a: 0,
+        b: 0,
+        c: 0
+    } //a,b,c, beta
 var s = 10;
-var balls=[];
+var balls = [];
 
 let frames = [];
 let bufferSeconds = 10;
 let maxFrames = 0;
 let bufferInput;
 let bufferLabel;
-let lastTime = -1;
+let lastFrame = -1;
 
 let frameNum = 0;
 let playbackMode = false;
@@ -45,367 +69,504 @@ let btnNext;
 let btnPlay;
 let btnMode;
 let btnClear;
+let btnRect;
+let btnClearRects;
 function setup() {
-pixelDensity(1);
-	createCanvas(windowWidth, windowHeight);
-	initCam();
+    pixelDensity(1);
+    createCanvas(windowWidth, windowHeight);
+    initCam();
 
-bufferLabel = createSpan("Buffer (s): ");
+    bufferLabel = createSpan("Buffer (s): ");
 
-bufferInput = createInput("10");
-bufferInput.size(50);
+    bufferInput = createInput("10");
+    bufferInput.size(50);
 
-bufferInput.input(function () {
-	let t = parseFloat(bufferInput.value());
-	if (!isNaN(t) && t > 0) {
-		bufferSeconds = t;
-	}
-});
-  	btnRecord = createButton("Review");
-	btnRecord.mousePressed(startPlayback);
+    bufferInput.input(function() {
+        let t = parseFloat(bufferInput.value());
+        if (!isNaN(t) && t > 0) {
+            bufferSeconds = t;
+        }
+    });
+    btnRecord = createButton("Review");
+    btnRecord.mousePressed(startPlayback);
 
-	btnFit = createButton("Fit");
-	btnFit.mousePressed(fitTrajectory);
+    btnFit = createButton("Fit");
+    btnFit.mousePressed(fitTrajectory);
 
-	btnPrev = createButton("◀");
-	btnPrev.mousePressed(prevFrame);
+    btnPrev = createButton("◀");
+    btnPrev.mousePressed(prevFrame);
 
-	btnNext = createButton("▶");
-	btnNext.mousePressed(nextFrame);
+    btnNext = createButton("▶");
+    btnNext.mousePressed(nextFrame);
 
-	btnPlay = createButton("Play");
-	btnPlay.mousePressed(togglePlay);
+    btnPlay = createButton("Play");
+    btnPlay.mousePressed(togglePlay);
 
-	btnMode = createButton("Pan/Zoom");
-	btnMode.mousePressed(toggleMode);
+    btnMode = createButton("Pan/Zoom");
+    btnMode.mousePressed(toggleMode);
 
-	btnClear = createButton("Clear");
-	btnClear.mousePressed(function(){
-		balls = [];
-	});
+    btnClear = createButton("Clear");
+    btnClear.mousePressed(function() {
+        balls = [];
+    });
 
-	let buttons = [
-		btnRecord, btnFit, btnPrev,
-		btnPlay, btnNext,
-		btnMode, btnClear
-	];
+    btnRect = createButton("Rect");
+    btnRect.mousePressed(function() {
+        rectMode = !rectMode;
+        btnRect.html(rectMode ? "Rect: ON" : "Rect: OFF");
+    });
+    btnClearRects = createButton("Clear Rects");
+    btnClearRects.mousePressed(function() {
+        rects = [];
+    });
 
-	for(let i=0;i<buttons.length;i++){
-		buttons[i].style("font-size","20px");
-		buttons[i].style("margin","5px");
-	}
+    let buttons = [
+        btnRecord, btnFit, btnPrev,
+        btnPlay, btnNext,
+        btnMode, btnClear
+    ];
+
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].style("font-size", "20px");
+        buttons[i].style("margin", "5px");
+    }
+
+    cam.elt.requestVideoFrameCallback(onNewCameraFrame);
+    startMs = Date.now();
 }
 
 function draw() {
-  frameRate(24);
-	if (!playbackMode) {
-		recordFrame();
-	} else {
-		playFrames();
-	}
-}
+    frameRate(24);
+    if (!playbackMode) {
+        //recordFrame(); done in onNewCameraFrame, rects drawn in recordFrame
+        
+    } else {
+        playFrames();
+    }
 
+}
+var currentRect = [];
+function drawRects() {
+    noFill();
+    stroke(255, 0, 0);
+
+    // safe guard if camera not ready
+    let scale = (cam && cam.width) ? min(width / cam.width, height / cam.height) : 1;
+    let ox = (width - (cam ? cam.width * scale : width)) / 2;
+    let oy = (height - (cam ? cam.height * scale : height)) / 2;
+
+    // When in playbackMode we draw inside translate/scale (image-space),
+    // so rects are stored as image coordinates [ix,iy,iw,ih].
+    if (playbackMode) {
+        strokeWeight(3 / zoom);
+        for (let i = 0; i < rects.length; i++) {
+            let r = rects[i];
+            rect(r[0], r[1], r[2], r[3]);
+        }
+
+        if (currentRect && currentRect.length == 4) {
+            let r = currentRect;
+            rect(r[0], r[1], r[2], r[3]);
+        }
+        return;
+    }
+
+    // Live mode: convert image-space rects to screen coords before drawing
+    strokeWeight(3 / zoom);
+    for (let i = 0; i < rects.length; i++) {
+        let r = rects[i];
+        let sx = ox + r[0] * scale;
+        let sy = oy + r[1] * scale;
+        let sw = r[2] * scale;
+        let sh = r[3] * scale;
+        rect(sx, sy, sw, sh);
+    }
+
+    if (currentRect && currentRect.length == 4) {
+        let r = currentRect;
+        let sx = ox + r[0] * scale;
+        let sy = oy + r[1] * scale;
+        let sw = r[2] * scale;
+        let sh = r[3] * scale;
+        rect(sx, sy, sw, sh);
+    }
+}
 function initCam() {
-      cam = createCapture({
-	video:{
-		facingMode:{ideal:"environment"},
-		width:{ideal:99999},
-		height:{ideal:99999}
-	},
-    	audio: false
+    cam = createCapture({
+        video: {
+            facingMode: {
+                ideal: "environment"
+            },
+            width: {
+                ideal: 99999
+            },
+            height: {
+                ideal: 99999
+            }
+        },
+        audio: false
     });
 
-	cam.hide();
-  
-}
+    cam.hide();
 
+}
+onNewCameraFrame = (now, metadata) => {
+    console.log("onNewCameraFrame");
+    if(playbackMode) return;
+    recordFrame();
+    cam.elt.requestVideoFrameCallback(onNewCameraFrame);
+};
 function recordFrame() {
-  
-  let scale = min(width/cam.width, height/cam.height);
+    console.log("recordFrame");
+    let scale = min(width / cam.width, height / cam.height);
 
-let w = cam.width * scale;
-let h = cam.height * scale;
+    let w = cam.width * scale;
+    let h = cam.height * scale;
 
-image(
-	cam,
-	(width-w)/2,
-	(height-h)/2,
-	w,
-	h
-);
-  
+    image(
+        cam,
+        (width - w) / 2,
+        (height - h) / 2,
+        w,
+        h
+    );
 
-	if (cam.elt.currentTime !== lastTime) {
-		lastTime = cam.elt.currentTime;
-let img = createImage(cam.width, cam.height);
-img.copy(cam, 0, 0, cam.width, cam.height,
-              0, 0, cam.width, cam.height);
-frames.push(img);
 
-let fps = cam.elt.getVideoPlaybackQuality ?
-	cam.elt.getVideoPlaybackQuality().totalVideoFrames / cam.elt.currentTime :
-	30;
+    let img = createImage(cam.width, cam.height);
+    img.copy(cam, 0, 0, cam.width, cam.height,
+        0, 0, cam.width, cam.height);
+    
+    frames.push(img);
+    framesMs.push(Date.now() - startMs);
+    let fps = 30;
+    if (cam.elt.getVideoPlaybackQuality && cam.elt.currentTime > 0) {
+        fps = cam.elt.getVideoPlaybackQuality().totalVideoFrames / cam.elt.currentTime;
+    }
 
-maxFrames = Math.max(1, Math.round(bufferSeconds * fps));
+    fps = Math.max(1, Math.min(fps, 120)); // optional clamp
 
-while (frames.length > maxFrames) {
-	frames.shift();
+    maxFrames = Math.max(1, Math.round(bufferSeconds * fps));
+
+    while (frames.length > maxFrames) {
+        frames.shift();
+    }
+
+    fill(255);
+    stroke(0);
+    drawRects();
+    let duration = frames.length / (maxFrames / bufferSeconds);
+    noStroke();
+    fill(0);
+    text("\u2588".repeat(20), 10, 20);
+    fill(255);
+    text(
+        "Buffer: " +
+        duration.toFixed(1) +
+        " / " +
+        bufferSeconds.toFixed(1) +
+        " s",
+        10,
+        20
+    );
+
 }
-	}
 
-  fill(255);
-stroke(0);
+function parabola(a, b, c) {
+    return (x) => a * x * x + b * x + c;
+}
 
-let duration = frames.length / (maxFrames / bufferSeconds);
-fill(0);
-text("\u2588".repeat(20), 10, 20);
-  fill(255);
-text(
-	"Buffer: " +
-	duration.toFixed(1) +
-	" / " +
-	bufferSeconds.toFixed(1) +
-	" s",
-	10,
-	20
-);
-}
-function parabola(a,b,c){
-  return (x)=>a*x*x+b*x+c;
-}
 function playFrames() {
-  push();
+    push();
 
-translate(panX, panY);
-scale(zoom);
+    translate(panX, panY);
+    scale(zoom);
 
-image(frames[frameNum], 0, 0);
+    image(frames[frameNum], 0, 0);
 
-for (var i = 0; i < balls.length; i++) {
-	balls[i].draw();
+    for (var i = 0; i < balls.length; i++) {
+        balls[i].draw();
+    }
+
+
+    var par = parabola(pitch1.a, pitch1.b, pitch1.c);
+
+    for (var i = 0; i < width; i += s) {
+        strokeWeight(3);
+        stroke(0, 255, 0);
+        line(i, par(i), i - s, par(i - s));
+    }
+
+    drawRects();
+    pop();
+    if (playing) {
+        frameNum++;
+        loopFrame();
+    }
+    noStroke();
+    fill(0);
+    text("\u2588".repeat(20) + "\n" + "\u2588".repeat(20), 10, 20);
+    fill(255);
+    text(
+        "Frame: " + frameNum + " / " + (frames.length - 1)+"\nMs: "+framesMs[frameNum].toFixed(0) + " / " + framesMs[frames.length - 1].toFixed(0),
+        10, 20
+    );
 }
 
-strokeWeight(3 / zoom);
-stroke(255,0,0,100);
-
-var par = parabola(pitch1.a,pitch1.b,pitch1.c);
-
-for(var i=0;i<width;i+=s){
-  
-	line(i,par(i),i-s,par(i-s));
+function toImage(x, y) {
+    return {
+        x: (x - panX) / zoom,
+        y: (y - panY) / zoom
+    };
 }
 
-pop();
-if (playing) {
-	frameNum++;
-	loopFrame();
-}
-}
-function toImage(x,y){
-	return {
-		x:(x-panX)/zoom,
-		y:(y-panY)/zoom
-	};
-}
-
-function keyPressed(){
-	if(key=="r") startPlayback();
-	if(key=="s") fitTrajectory();
-	if(key==".") nextFrame();
-	if(key==",") prevFrame();
-	if(key==" ") togglePlay();
-}
-
-
-function mouseClicked(){
-	if(!playbackMode || !editMode) return;
-	if(mouseX < 0 || mouseX > width ||
-	   mouseY < 0 || mouseY > height){
-		return;
-	}
-
-	var p = toImage(mouseX,mouseY);
-
-	var shiftPressed = keyIsPressed && keyCode==16;
-
-	balls.push(new Ball(p.x,p.y,frameNum,shiftPressed));
-}
-function mouseDragged(){
-	if(editMode) return;
-
-	panX += movedX;
-	panY += movedY;
-}
-function mouseWheel(event){
-	if(editMode) return;
-
-	let factor = event.delta > 0 ? 0.9 : 1.1;
-
-	let ix = (mouseX-panX)/zoom;
-	let iy = (mouseY-panY)/zoom;
-
-	zoom *= factor;
-
-	panX = mouseX - ix*zoom;
-	panY = mouseY - iy*zoom;
-
-	return false;
+function keyPressed() {
+    if (key == "r") startPlayback();
+    if (key == "s") fitTrajectory();
+    if (key == ".") nextFrame();
+    if (key == ",") prevFrame();
+    if (key == " ") togglePlay();
 }
 
 
-function startPlayback(){
-	playbackMode = true;
+function mouseClicked() {
+    if (!playbackMode || !editMode) return;
+    if (mouseX < 0 || mouseX > width ||
+        mouseY < 0 || mouseY > height) {
+        return;
+    }
+
+    var p = toImage(mouseX, mouseY);
+
+    var shiftPressed = keyIsPressed && keyCode == 16;
+
+    balls.push(new Ball(p.x, p.y, frameNum, shiftPressed));
+}
+var currentRect = [];
+function mouseDragged() {
+    if(rectMode){
+        // guard: ensure camera available
+        if (!cam || !cam.width) {
+            // fallback to screen-space behavior (keeps old behavior before cam ready)
+            if(currentRect.length == 0){
+                currentRect = [mouseX, mouseY, 0, 0];
+            } else {
+                currentRect[2] = mouseX - currentRect[0];
+                currentRect[3] = mouseY - currentRect[1];
+            }
+            return;
+        }
+
+        // convert mouse screen coords -> image coords and store rects in image-space
+        let scale = min(width / cam.width, height / cam.height);
+        let ox = (width - cam.width * scale) / 2;
+        let oy = (height - cam.height * scale) / 2;
+
+        let ix = (mouseX - ox) / scale;
+        let iy = (mouseY - oy) / scale;
+
+        if (!currentRect || currentRect.length == 0) {
+            currentRect = [ix, iy, 0, 0];
+        } else {
+            currentRect[2] = ix - currentRect[0];
+            currentRect[3] = iy - currentRect[1];
+        }
+        return;
+    }
+
+    if (editMode) return;
+    if(!rectMode){
+        panX += movedX;
+        panY += movedY;
+    }
+
+}
+function mouseReleased() {
+    if(rectMode && currentRect && currentRect.length == 4){
+        rects.push(currentRect);
+        currentRect = [];
+    }
+}
+function mouseWheel(event) {
+    if (editMode) return;
+
+    let factor = event.delta > 0 ? 0.9 : 1.1;
+
+    let ix = (mouseX - panX) / zoom;
+    let iy = (mouseY - panY) / zoom;
+
+    zoom *= factor;
+
+    panX = mouseX - ix * zoom;
+    panY = mouseY - iy * zoom;
+
+    return false;
 }
 
-function fitTrajectory(){
-	if(balls.length >= 3){
-		var points = balls.map(b => [b.screenX,b.screenY]);
-		pitch1 = calcBestFit(points);
-	}
+
+function startPlayback() {
+    playbackMode = true;
 }
 
-function prevFrame(){
-	frameNum--;
-	loopFrame();
+function fitTrajectory() {
+    if (balls.length >= 3) {
+        var points = balls.map(b => [b.screenX, b.screenY]);
+        pitch1 = calcBestFit(points);
+    }
 }
 
-function nextFrame(){
-	frameNum++;
-	loopFrame();
+function prevFrame() {
+    frameNum--;
+    loopFrame();
 }
 
-function togglePlay(){
-	playing = !playing;
-	btnPlay.html(playing ? "Pause" : "Play");
+function nextFrame() {
+    frameNum++;
+    loopFrame();
 }
 
-function toggleMode(){
-	editMode = !editMode;
-	btnMode.html(editMode ? "Pan/Zoom" : "Trace");
-}
-function touchMoved(){
-	if(editMode) return;
-
-	if(touches.length==1){
-		panX += touches[0].x-pmouseX;
-		panY += touches[0].y-pmouseY;
-	}
-	else if(touches.length==2){
-		let dx = touches[0].x-touches[1].x;
-		let dy = touches[0].y-touches[1].y;
-
-		let d = sqrt(dx*dx+dy*dy);
-
-		if(lastTouchDist!=0){
-          let x1 = touches[0].x;
-let y1 = touches[0].y;
-
-let x2 = touches[1].x;
-let y2 = touches[1].y;
-
-let cx = (x1+x2)/2;
-let cy = (y1+y2)/2;
-
-let dx = x1-x2;
-let dy = y1-y2;
-
-let d = sqrt(dx*dx+dy*dy);
-
-if(lastTouchDist!=0){
-
-	let ix = (cx-panX)/zoom;
-	let iy = (cy-panY)/zoom;
-
-	zoom *= d/lastTouchDist;
-
-	panX = cx - ix*zoom;
-	panY = cy - iy*zoom;
+function togglePlay() {
+    playing = !playing;
+    btnPlay.html(playing ? "Pause" : "Play");
 }
 
-lastTouchDist = d;
-		}
-
-		lastTouchDist = d;
-	}
-
-	return false;
+function toggleMode() {
+    editMode = !editMode;
+    btnMode.html(editMode ? "Pan/Zoom" : "Trace");
 }
 
-function touchEnded(){
-	lastTouchDist = 0;
+function touchMoved() {
+    if (editMode) return;
+
+    if (touches.length == 1) {
+        panX += touches[0].x - pmouseX;
+        panY += touches[0].y - pmouseY;
+    } else if (touches.length == 2) {
+        let dx = touches[0].x - touches[1].x;
+        let dy = touches[0].y - touches[1].y;
+
+        let d = sqrt(dx * dx + dy * dy);
+
+        if (lastTouchDist != 0) {
+            let x1 = touches[0].x;
+            let y1 = touches[0].y;
+
+            let x2 = touches[1].x;
+            let y2 = touches[1].y;
+
+            let cx = (x1 + x2) / 2;
+            let cy = (y1 + y2) / 2;
+
+            let dx = x1 - x2;
+            let dy = y1 - y2;
+
+            let d = sqrt(dx * dx + dy * dy);
+
+            if (lastTouchDist != 0) {
+
+                let ix = (cx - panX) / zoom;
+                let iy = (cy - panY) / zoom;
+
+                zoom *= d / lastTouchDist;
+
+                panX = cx - ix * zoom;
+                panY = cy - iy * zoom;
+            }
+
+            lastTouchDist = d;
+        }
+
+        lastTouchDist = d;
+    }
+
+    return false;
 }
-function Ball(screenX, screenY, frameNum, isPitch){
-  this.screenX = screenX;
-  this.screenY = screenY;
-  this.frameNum = frameNum;
-  this.isPitch = isPitch;
+
+function touchEnded() {
+    lastTouchDist = 0;
 }
-Ball.prototype.draw = function(){
-  if(!this.isPitch){
-    if(frameNum == this.frameNum) fill(255,0,0);
-    else fill(0)
-    
-    ellipse(this.screenX, this.screenY, 30, 30);
-  }else{
-    fill(0,255,0);
-    
-    if(frameNum == this.frameNum) fill(255,0,0);
-    ellipse(this.screenX, this.screenY, 30, 30);
-  }
+
+function Ball(screenX, screenY, frameNum, isPitch) {
+    this.screenX = screenX;
+    this.screenY = screenY;
+    this.frameNum = frameNum;
+    this.isPitch = isPitch;
 }
+Ball.prototype.draw = function() {
+    if (!this.isPitch) {
+        if (frameNum == this.frameNum) fill(255, 0, 0);
+        else fill(0)
+
+        ellipse(this.screenX, this.screenY, 30, 30);
+    } else {
+        fill(0, 255, 0);
+
+        if (frameNum == this.frameNum) fill(255, 0, 0);
+        ellipse(this.screenX, this.screenY, 30, 30);
+    }
+}
+
 function fitParabola(p1, p2, p3) {
-	var x1 = p1[0], y1 = p1[1];
-	var x2 = p2[0], y2 = p2[1];
-	var x3 = p3[0], y3 = p3[1];
+    var x1 = p1[0],
+        y1 = p1[1];
+    var x2 = p2[0],
+        y2 = p2[1];
+    var x3 = p3[0],
+        y3 = p3[1];
 
-	var d =
-		(x1 - x2) *
-		(x1 - x3) *
-		(x2 - x3);
+    var d =
+        (x1 - x2) *
+        (x1 - x3) *
+        (x2 - x3);
 
 
 
-	var a =
-		(x3 * (y2 - y1) +
-		 x2 * (y1 - y3) +
-		 x1 * (y3 - y2)) / d;
+    var a =
+        (x3 * (y2 - y1) +
+            x2 * (y1 - y3) +
+            x1 * (y3 - y2)) / d;
 
-	var b =
-		(x3*x3 * (y1 - y2) +
-		 x2*x2 * (y3 - y1) +
-		 x1*x1 * (y2 - y3)) / d;
+    var b =
+        (x3 * x3 * (y1 - y2) +
+            x2 * x2 * (y3 - y1) +
+            x1 * x1 * (y2 - y3)) / d;
 
-	var c =
-		(x2*x3*(x2 - x3) * y1 +
-		 x3*x1*(x3 - x1) * y2 +
-		 x1*x2*(x1 - x2) * y3) / d;
+    var c =
+        (x2 * x3 * (x2 - x3) * y1 +
+            x3 * x1 * (x3 - x1) * y2 +
+            x1 * x2 * (x1 - x2) * y3) / d;
 
-	return {a: a, b: b, c: c};
+    return {
+        a: a,
+        b: b,
+        c: c
+    };
 }
 
 
-function calcBestFit(points){
-  return fitParabola(points[0], points[1], points[2]);
+function calcBestFit(points) {
+    return fitParabola(points[0], points[1], points[2]);
 }
 
 function calcErr(par, points) {
-	var err = 0;
+    var err = 0;
 
-	for (var i = 0; i < points.length; i++) {
-		var dx = points[i][1] - par(points[i][0]);
-		err += dx * dx;
-	}
+    for (var i = 0; i < points.length; i++) {
+        var dx = points[i][1] - par(points[i][0]);
+        err += dx * dx;
+    }
 
-	return err;
+    return err;
 }
 
 
 
 function loopFrame() {
-	if (frames.length === 0) return;
+    if (frames.length === 0) return;
 
-	if (frameNum < 0) frameNum = frames.length - 1;
-	if (frameNum >= frames.length) frameNum = 0;
-}</script>
+    if (frameNum < 0) frameNum = frames.length - 1;
+    if (frameNum >= frames.length) frameNum = 0;
+}
+</script>
   </body>
 </html>
+
