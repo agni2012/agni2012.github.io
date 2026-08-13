@@ -12,6 +12,7 @@
 
   </head>
   <body>
+  <p id="pt">open console to see what how much more is remaining for the bot to thing</p>
     <main>
     </main>
     <script>// noprotect
@@ -157,21 +158,21 @@ function setup() {
 
   
   let queen = createButton('Promote to Queen');
-  queen.position(0, width);
+  queen.position(0, width+100);
   queen.mousePressed(()=>{playerPromoteTo="queen"});
   let knight = createButton('Promote to Knight');
-  knight.position(queen.width, width);
+  knight.position(queen.width, width+100);
   knight.mousePressed(()=>{playerPromoteTo="knight"});
   let bishop = createButton('Promote to Bishop');
-  bishop.position(0, width+knight.height);
+  bishop.position(0, width+knight.height+100);
   bishop.mousePressed(()=>{playerPromoteTo="bishop"});
   let rook = createButton('Promote to Rook');
-  rook.position(queen.width, width +knight.height);
+  rook.position(queen.width, width +knight.height+100);
   rook.mousePressed(()=>{playerPromoteTo="rook"});
 
   label = createP('Promote to: Queen');
   
-  label.position(0, 400+queen.height+bishop.height);
+  label.position(0, 500+queen.height+bishop.height);
   label.style('color', '#787878');
 }
 function drawBoard(board) {
@@ -712,6 +713,7 @@ function bot(side, board) {
 
   for(var i = 0; i < m.length; i++){
     dbg(i+" out of "+m.length+" done");
+
     var testBoard = structuredClone(board);
     testBoard = applyMove(m[i], testBoard);
 
