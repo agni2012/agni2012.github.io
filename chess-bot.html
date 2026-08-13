@@ -1,0 +1,840 @@
+<!-- noprotect -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@2.3.1/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5.sound@0.4.1/dist/p5.sound.min.js"></script>
+    
+    
+    
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+    </main>
+    <script>// noprotect
+let label;
+p5.disableFriendlyErrors = true;
+var playerPromoteTo = "queen";
+var botPromoteTo = "queen";
+var side = "white";
+var turn = "white";
+var highlightedSquares = [] //for all the legal moves
+var selectedPiece = null;
+var P = {
+  type: "pawn",
+  side: "white",
+  hasMoved: false
+};
+var R = {
+  type: "rook",
+  side: "white",
+  hasMoved: false
+};
+var B = {
+  type: "bishop",
+  side: "white",
+  hasMoved: false
+};
+var K = {
+  type: "king",
+  side: "white",
+  hasMoved: false
+};
+var N = {
+  type: "knight",
+  side: "white",
+  hasMoved: false
+};
+var Q = {
+  type: "queen",
+  side: "white",
+  hasMoved: false
+};
+var p = {
+  type: "pawn",
+  side: "black",
+  hasMoved: false
+};
+var r = {
+  type: "rook",
+  side: "black",
+  hasMoved: false
+};
+var b = {
+  type: "bishop",
+  side: "black",
+  hasMoved: false
+};
+var k = {
+  type: "king",
+  side: "black",
+  hasMoved: false
+};
+var n = {
+  type: "knight",
+  side: "black",
+  hasMoved: false
+};
+var q = {
+  type: "queen",
+  side: "black",
+  hasMoved: false
+};
+var _ = {
+  type: "empty",
+  side: "empty",
+  hasMoved: false
+};
+var dbg = console.log
+var err = (msg) => {
+  throw new Error(msg);
+}
+function c(x, y) {
+  return {
+    x: x,
+    y: y
+  }
+} //shorthand
+var getChessChar = function(type, side) {
+  if(type == "empty") return "";
+  if(side == "white") {
+    switch(type) {
+      case "pawn":
+        return "\u2659"
+      case "rook":
+        return "\u2656"
+      case "bishop":
+        return "\u2657"
+      case "knight":
+        return "\u2658"
+      case "queen":
+        return "\u2655"
+      case "king":
+        return "\u2654"
+    }
+  } else {
+    switch(type) {
+      case "pawn":
+        return "\u265F\uFE0E"
+      case "rook":
+        return "\u265C"
+      case "bishop":
+        return "\u265D"
+      case "knight":
+        return "\u265E"
+      case "queen":
+        return "\u265B"
+      case "king":
+        return "\u265A"
+    }
+  }
+}
+var board = ([
+  [r, p, _, _, _, _, P, R],
+  [n, p, _, _, _, _, P, N],
+  [b, p, _, _, _, _, P, B],
+  [q, p, _, _, _, _, P, Q],
+  [k, p, _, _, _, _, P, K],
+  [b, p, _, _, _, _, P, B],
+  [n, p, _, _, _, _, P, N],
+  [r, p, _, _, _, _, P, R],
+]).map(function(row) {
+  return row.map(function(piece) {
+    return structuredClone(piece);
+  });
+}); //to make hasMoved not linked
+board.enPassantFile = null;
+//peice {type: "pawn... etc", side: "white"}
+function setup() {
+  createCanvas(400, 400);
+  frameRate(10);
+
+  let cnv = select('canvas');
+  cnv.elt.addEventListener('contextmenu', e => e.preventDefault());
+
+  
+  let queen = createButton('Promote to Queen');
+  queen.position(0, width);
+  queen.mousePressed(()=>{playerPromoteTo="queen"});
+  let knight = createButton('Promote to Knight');
+  knight.position(queen.width, width);
+  knight.mousePressed(()=>{playerPromoteTo="knight"});
+  let bishop = createButton('Promote to Bishop');
+  bishop.position(0, width+knight.height);
+  bishop.mousePressed(()=>{playerPromoteTo="bishop"});
+  let rook = createButton('Promote to Rook');
+  rook.position(queen.width, width +knight.height);
+  rook.mousePressed(()=>{playerPromoteTo="rook"});
+
+  label = createP('Promote to: Queen');
+  
+  label.position(0, 400+queen.height+bishop.height);
+  label.style('color', '#787878');
+}
+function drawBoard(board) {
+
+  for(var x = 0; x < 8; x++) {
+    for(var y = 0; y < 8; y++) {
+      noStroke();
+      var rectX, rectY
+      if(side == "black") {
+        rectX = width / 8 * (7 - x);
+        rectY = height / 8 * (7 - y);
+      } else {
+        rectX = width / 8 * (x);
+        rectY = height / 8 * (y);
+      }
+      var rectSize = width / 8;
+      fill(110, 49, 13);
+      if((x + y) % 2 == 0) fill(255, 236, 64);
+      rect(rectX, rectY, rectSize, rectSize);
+      if(selectedPiece?.x == x && selectedPiece?.y == y) {
+        fill(125, 50, 168, 200);
+        rect(rectX, rectY, rectSize, rectSize);
+      }
+
+      if(highlightedSquares.some((p) => (p.x == x && p.y == y))) {
+        fill(100, 100);
+        circle(rectX + rectSize / 2, rectY + rectSize / 2, rectSize)
+      }
+      var piece = board[x][y];
+      var ch = getChessChar(piece.type, piece.side);
+      textAlign(LEFT, TOP)
+      textSize(rectSize * 1.15);
+      if(piece.side == "black") {
+        fill(0);
+        text(ch, rectX, rectY);
+      } else {
+        var chBlack = getChessChar(piece.type, "black");
+        fill(255);
+        text(chBlack, rectX, rectY);
+        fill(0);
+        text(ch, rectX, rectY);
+      }
+      //hasMoved rect
+      if(piece.hasMoved) fill(200, 0, 0);
+      else fill(0, 0, 200);
+      if(piece.type != "empty") rect(rectX, rectY + rectSize - 4, 4, 4)
+
+
+      textSize(10);
+      fill(100)
+      text("(" + x + "," + y + "),    "+scores[x][y], rectX, rectY);
+    }
+  }
+}
+function applyMove(x1, y1, x2, y2, board) { //also accepts ({x,y}, {x,y}), and {start:c..}
+
+  if(typeof x1 == "object") {
+    if(x1.start){
+      board = y1;
+      y2 = x1.end.y;
+      x2 = x1.end.x;
+      y1 = x1.start.y;
+      x1 = x1.start.x;
+    }else{
+      board = x2;
+      x2 = y1.x;
+      y2 = y1.y;
+      y1 = x1.y;
+      x1 = x1.x;
+    }
+  }
+  if(!board) err("applyMove needs a board argument")
+  board = structuredClone(board);
+  var piece = accessPiece(x1, y1, board);
+  if(piece.type == "pawn"){
+ 
+    var forwardDirection = piece.side =="white"?-1:1;
+    if(x1 != x2 && board[x2][y2].type == "empty"){
+      board[x2][y2-forwardDirection]=_;
+    }
+  }
+    
+  //king moves > 2 squares means castle
+  if(piece.type == "king" && abs(x1-x2)==2){
+    //just TRUST that if the king is castling its valid...
+    board = applyMove(
+      ((x1-x2)>0)?c(0,y1):c(7,y1), //the rook x
+      c((x1+x2)/2,y1), board) //Mean of king start and end
+  }
+  board[x2][y2] = piece;
+  board[x1][y1] = _;
+  
+  board[x2][y2].hasMoved = true;
+  
+  if(piece.type == "pawn" && (y2 == 0 || y2 == 7)){
+    var promoteTo = playerPromoteTo;
+    if(piece.side != side) promoteTo = botPromoteTo;
+  	board[x2][y2].type = promoteTo;
+  }
+  
+  board.enPassantFile = null;
+  
+  if(piece.type == "pawn" && abs(y2-y1) == 2){
+  	board.enPassantFile = x1;
+  }
+  
+  return board;
+}
+function draw() {
+  background(220);
+  
+  drawBoard(board);
+  fill(255, 0, 0);
+  textSize(10);
+  text(frameCount, 10, height - 10);
+  if(getAllLegalMoves(turn, board).length == 0){
+    noLoop();
+    if(isInCheck(turn, board)){
+      gameOver("checkmate", oppositeSide(turn))
+    }else{
+      gameOver("stalemate");
+    }
+  }
+  label.html("Promote to: " + playerPromoteTo);
+  if(turn == "black"){
+    var m = bot("black", board)
+    board = applyMove(m, board);
+    turn = "white"
+  }
+                    
+}
+function gameOver(state, side){
+  if(state == "checkmate"){
+    err("Game Over! Good job "+side)
+  }else{
+    err("Oof a draw!")
+  }
+}
+function pieceLegalMoves(pos, board) {
+  if(!board) err("PLM needs a board arg");
+  var piece = accessPiece(pos, board);
+  if(piece.type == "empty") return [];
+  var legalMoves = [];
+
+  function testMoveByOffset(xo, yo) {
+    try {
+      var target = accessPiece(pos.x + xo, pos.y + yo, board);
+
+      if(target.type == "empty") {
+        legalMoves.push({
+          x: pos.x + xo,
+          y: pos.y + yo
+        });
+        return true;
+      }
+
+      if(target.side != piece.side) {
+        legalMoves.push({
+          x: pos.x + xo,
+          y: pos.y + yo
+        });
+      }
+
+      return false;
+    } catch (e) {}
+    return false;
+  }
+
+  function testPathByOffset(xo, yo) {
+    var xTravelled = 0;
+    var yTravelled = 0;
+
+    do {
+      xTravelled += xo;
+      yTravelled += yo;
+    } while(testMoveByOffset(xTravelled, yTravelled));
+  }
+  switch(piece.type) {
+    case "pawn":
+      //sorry future dev but i implimented testMoveByOffset AFTER coding this so im not recoding this
+      if(pos.y == 0 || pos.y == 7) {
+        //WHY ARE YOU HERE
+        return [];
+      }
+
+      if(piece.side == "white") {
+        if(accessPiece(pos.x, pos.y - 1, board).type == "empty") {
+          legalMoves.push({
+            x: pos.x,
+            y: pos.y - 1
+          });
+          if(!piece.hasMoved &&
+            accessPiece(pos.x, pos.y - 2, board).type == "empty") {
+            legalMoves.push({
+              x: pos.x,
+              y: pos.y - 2
+            });
+          }
+        }
+        //capture
+        try {
+          if(accessPiece(pos.x - 1, pos.y - 1, board).side != piece.side && accessPiece(pos.x - 1, pos.y - 1, board).type != "empty") {
+            legalMoves.push({
+              x: pos.x - 1,
+              y: pos.y - 1
+            });
+          }
+        } catch (e) {}
+        try {
+          if(accessPiece(pos.x + 1, pos.y - 1, board).side != piece.side && accessPiece(pos.x + 1, pos.y - 1, board).type != "empty") {
+            legalMoves.push({
+              x: pos.x + 1,
+              y: pos.y - 1
+            });
+          }
+        } catch (e) {}
+      } else {
+        if(accessPiece(pos.x, pos.y + 1, board).type == "empty") {
+          legalMoves.push({
+            x: pos.x,
+            y: pos.y + 1
+          });
+          if(!piece.hasMoved &&
+            accessPiece(pos.x, pos.y + 2, board).type == "empty") {
+            legalMoves.push({
+              x: pos.x,
+              y: pos.y + 2
+            });
+          }
+        }
+        //capture
+        try {
+          if(accessPiece(pos.x - 1, pos.y + 1, board).side != piece.side && accessPiece(pos.x - 1, pos.y + 1, board).type != "empty") {
+            legalMoves.push({
+              x: pos.x - 1,
+              y: pos.y + 1
+            });
+          }
+        } catch (e) {}
+        try {
+          if(accessPiece(pos.x + 1, pos.y + 1, board).side != piece.side && accessPiece(pos.x + 1, pos.y + 1, board).type != "empty") {
+            legalMoves.push({
+              x: pos.x + 1,
+              y: pos.y + 1
+            });
+          }
+        } catch (e) {}
+      }
+      return legalMoves;
+      break;
+
+    case "king":
+      testMoveByOffset(1, 0)
+      testMoveByOffset(0, 1)
+      testMoveByOffset(-1, 0)
+      testMoveByOffset(0, -1)
+      testMoveByOffset(1, 1)
+      testMoveByOffset(1, -1)
+      testMoveByOffset(-1, 1)
+      testMoveByOffset(-1, -1);
+
+      return legalMoves;
+    case "rook":
+      testPathByOffset(1, 0);
+      testPathByOffset(0, 1);
+      testPathByOffset(-1, 0);
+      testPathByOffset(0, -1);
+      return legalMoves;
+    case "bishop":
+      testPathByOffset(1, 1);
+      testPathByOffset(-1, -1);
+      testPathByOffset(-1, 1);
+      testPathByOffset(1, -1);
+      return legalMoves;
+    case "queen":
+      testPathByOffset(1, 0);
+      testPathByOffset(0, 1);
+      testPathByOffset(-1, 0);
+      testPathByOffset(0, -1);
+      testPathByOffset(1, 1);
+      testPathByOffset(-1, -1);
+      testPathByOffset(-1, 1);
+      testPathByOffset(1, -1);
+      return legalMoves;
+    case "knight":
+      testMoveByOffset(2, -1);
+      testMoveByOffset(2, 1);
+      testMoveByOffset(-2, 1);
+      testMoveByOffset(-2, -1);
+      testMoveByOffset(1, 2);
+      testMoveByOffset(1, -2);
+      testMoveByOffset(-1, 2);
+      testMoveByOffset(-1, -2);
+      return legalMoves;
+      break;
+  }
+  return [];
+}
+function screenCordsToChessBoardCoords(x, y) {
+
+  var rectSize = width / 8;
+  if(side == "white")
+    return {
+      x: floor(x / rectSize),
+      y: floor(y / rectSize)
+    };
+  else return {
+    x: 7 - floor((x) / rectSize),
+    y: 7 - floor((y) / rectSize)
+  };
+}
+function accessPiece(x, y, board) { //also accepts ({x,y})
+
+  if(typeof x == "object") {
+    board = y;
+    y = x.y;
+    x = x.x;
+  }
+  if(!board) err("Access Piece needs a board argument")
+  return board[x][y];
+}
+function getAllLegalMoves(side, board) {
+  if(!board) err("GALM needs board");
+
+  var moves = [];
+  for(var x = 0; x < 8; x++) {
+    for(var y = 0; y < 8; y++) {
+      if(board[x][y].side == side) {
+        var piece = board[x][y];
+        var plm = pieceLegalMoves({
+          x: x,
+          y: y
+        }, board);
+        for(var i = 0; i < plm.length; i++) {
+          var checkTestBoard = structuredClone(board);
+          var move = {
+            start: {
+              x: x,
+              y: y
+            },
+            end: plm[i]
+          }
+          checkTestBoard = applyMove(move.start, move.end, checkTestBoard);
+          if(!isInCheck(side, checkTestBoard)) {
+            moves.push(move);
+          }
+        }
+        //en passant
+        //trust me you dont need to check that its white, chatgpt, dont worry
+        var move;
+        if(piece.type == "pawn"){
+          var forward = piece.side == "white"?-1:1
+          var correctRank = piece.side=="white"?3:5
+          if((board.enPassantFile == x+1 || board.enPassantFile == x-1) && y==correctRank){
+            move = {start:c(x,y), end: c(board.enPassantFile, correctRank+forward)}
+            var testCheckBoard = structuredClone(board);
+            testCheckBoard = applyMove(move, testCheckBoard)
+            if(!isInCheck(side, testCheckBoard))
+              moves.push(move);
+          }
+        }
+        
+        //castling
+        if(piece.type == "king" && !piece.hasMoved && !isInCheck(side, board)){
+          var QSRook;
+          var KSRook;
+          if(side == "white"){
+            if(board[0][7].type == "rook" && board[0][7].side == "white")
+              QSRook = board[0][7];
+            if(board[7][7].type == "rook" && board[7][7].side == "white")
+              KSRook = board[7][7];
+          }
+          if(side == "black"){
+            if(board[0][0].type == "rook" && board[0][0].side == "black")
+              QSRook = board[0][0];
+            if(board[7][0].type == "rook" && board[7][0].side == "black")
+              KSRook = board[7][0];
+          }
+
+          QSRookIf: if(QSRook && !QSRook.hasMoved){
+            var testCastle = structuredClone(board);
+            if(board[x-1][y].type != "empty") break QSRookIf;
+            if(board[x-2][y].type != "empty") break QSRookIf;
+            if(board[x-3][y].type != "empty") break QSRookIf;
+            testCastle = applyMove(c(x,y), c(x-1,y), testCastle);
+            if(isInCheck(side, testCastle)) break QSRookIf;
+            testCastle = applyMove(c(x-1,y), c(x-2,y), testCastle);
+            if(isInCheck(side, testCastle)) break QSRookIf;
+            moves.push({start:c(x,y), end: c(x-2,y)});
+          }
+          KSRookIf: if(KSRook && !KSRook.hasMoved){
+            var testCastle = structuredClone(board);
+            if(board[x+1][y].type != "empty") break KSRookIf;
+            if(board[x+2][y].type != "empty") break KSRookIf;
+            testCastle = applyMove(c(x,y), c(x+1,y), testCastle);
+            if(isInCheck(side, testCastle)) break KSRookIf;
+            testCastle = applyMove(c(x+1,y), c(x+2,y), testCastle);
+            if(isInCheck(side, testCastle)) break KSRookIf;
+            moves.push({start:c(x,y), end: c(x+2,y)});
+          }
+        }
+      }
+    }
+  }
+  return moves;
+}
+
+function oppositeSide(side) {
+  return side == "white" ? "black" : "white";
+}
+function isPieceAttacked(pos, attackingSide, board) {
+  if(!board) err("IPA reqs. board");
+  var attacked = accessPiece(pos, board);
+
+  for(var x = 0; x < 8; x++) {
+    for(var y = 0; y < 8; y++) {
+      var piece = board[x][y];
+
+      if(piece.side != attackingSide) continue;
+
+      if(piece.type == "pawn") {
+        var dir = attackingSide == "white" ? -1 : 1;
+
+        if(pos.x == x - 1 && pos.y == y + dir) return true;
+        if(pos.x == x + 1 && pos.y == y + dir) return true;
+      } else {
+        var moves = pieceLegalMoves({
+          x: x,
+          y: y
+        }, board);
+
+        for(var i = 0; i < moves.length; i++) {
+          if(moves[i].x == pos.x && moves[i].y == pos.y) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
+function isInCheck(side, board) {
+  if(!board) err("IIC needs a board arg");
+
+  var kingPos = null;
+
+  for(var x = 0; x < 8; x++) {
+    for(var y = 0; y < 8; y++) {
+      var p = board[x][y];
+
+      if(p.type == "king" && p.side == side) {
+        kingPos = {
+          x: x,
+          y: y
+        };
+      }
+    }
+  }
+
+  if(kingPos == null) return false;
+
+  return isPieceAttacked(
+    kingPos,
+    oppositeSide(side),
+    board
+  );
+}
+mouseClicked = function() {
+  if(!(mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height)){
+    return;
+  }
+  if(selectedPiece == null) {
+    var coords = screenCordsToChessBoardCoords(mouseX, mouseY);
+    if(accessPiece(coords, board).type == "empty") {
+      //err, not really anything, what are you doing user
+    } else {
+      selectedPiece = coords;
+    }
+    highlightedSquares = getAllLegalMoves(side, board)
+	.filter(function(move) {
+		return move.start.x == coords.x && move.start.y == coords.y;
+	})
+	.map(function(move) {
+		return move.end;
+	});
+  } else {
+    //move it!
+    var coords = screenCordsToChessBoardCoords(mouseX, mouseY);
+    if(highlightedSquares.some((p)=>(p.x == coords.x && p.y == coords.y))){
+      board = applyMove(selectedPiece, coords, board);
+      selectedPiece = null;
+      highlightedSquares = [];
+
+      turn = oppositeSide(turn)
+      //draw it
+      drawBoard(board);
+    }else{
+      clearHightlights()
+    }
+    //side = side == "white"?"black":"white"
+  }
+}
+function clearHightlights(){
+  selectedPiece = null;
+  highlightedSquares = [];
+}
+
+</script>
+    <script>var scores = [];
+for(var i=0;i<8;i++){
+  scores.push([0,0,0,0,0,0,0,0]);
+}
+function resetScores(){
+  scores=[];
+  for(var i=0;i<8;i++){
+  scores.push([0,0,0,0,0,0,0,0]);
+}
+}
+var depth = 3; //actually searches this + 1.
+
+var searchDepths = {};
+var values = {
+  "pawn":  1,
+  "rook":  5,
+  "queen": 9,
+  "bishop":3,
+  "knight":3,
+  "king": 9007199254740, //really high number but 100x below highest integer with precision
+  "empty":0
+}
+
+function bot(side, board) {
+
+  var m = getAllLegalMoves(side, board);
+  var bestMoveScore = -Infinity;
+  var bestMoveIndexes = [];
+
+  for(var i = 0; i < m.length; i++){
+    dbg(i+" out of "+m.length+" done");
+    var testBoard = structuredClone(board);
+    testBoard = applyMove(m[i], testBoard);
+
+    var score = -search(
+      oppositeSide(side),
+      testBoard,
+      depth
+    );
+    scores[m[i].start.x][m[i].start.y] = score;
+    if(score >= bestMoveScore){
+      if(score == bestMoveScore){
+        bestMoveIndexes.push(i)
+      }else{
+        bestMoveScore = score;
+        bestMoveIndexes = [i];
+      }
+      
+    }
+  }
+  var highestRate = -Infinity;
+  var highestRateIndexes = [];
+  
+  for(var i = 0; i < bestMoveIndexes.length; i++) {
+  	var index = bestMoveIndexes[i];
+  	var rate = rateMove(m[index]);
+  
+  	if(rate > highestRate) {
+  		highestRate = rate;
+  		highestRateIndexes = [index];
+  	}else if(rate == highestRate) {
+  		highestRateIndexes.push(index);
+  	}
+  }
+  
+  var r = floor(random(0, highestRateIndexes.length));
+  var index = highestRateIndexes[r];
+  
+  print(searchDepths);
+  return m[index];
+}
+
+//soley based on center attacking and castling
+function rateMove(m){
+  if(accessPiece(m.start, board).type == "king" && abs(m.start.x-m.end.x)==2){
+    return 10;
+  }
+  return 9-dist(m.end.x, m.end.y, 4, 4);
+}
+function search(side, board, n){
+  searchDepths[n]=searchDepths[n]+1||0;
+  
+  if(n == 1) return evalBoard(side, board);
+
+  var m = getAllLegalMoves(side, board);
+  //if(depth != n) m = findInterestingMoves(side, board);
+  var best = -Infinity;
+  for(var i=0;i<m.length;i++){
+    
+    var testBoard = structuredClone(board);
+    testBoard = applyMove(m[i], testBoard)
+    var val = -search(oppositeSide(side), testBoard, n-1);
+    
+    best = max(best, val)
+  }
+  return best
+}
+
+function findInterestingMoves(side, board) {
+	var m = getAllLegalMoves(side, board);
+	var captures = [];
+
+	for(var i = 0; i < m.length; i++) {
+		if(board[m[i].end.x][m[i].end.y].side == oppositeSide(side)) {
+			captures.push(m[i]);
+		}
+	}
+
+	if(captures.length > 0)
+		return captures;
+
+	return [];
+}
+function bestMovesD1(side, board) {
+	var m = getAllLegalMoves(side, board);
+	var startingEval = evalBoard(side, board);
+
+	var highestMoveVal = -Infinity;
+	var highestMoveIndexes = [];
+
+	for(var i = 0; i < m.length; i++) {
+		var testBoard = structuredClone(board);
+		testBoard = applyMove(m[i], testBoard);
+
+		var val = evalBoard(side, testBoard) - startingEval;
+
+		if(val > highestMoveVal) {
+			highestMoveVal = val;
+			highestMoveIndexes = [i];
+		}else if(val == highestMoveVal) {
+			highestMoveIndexes.push(i);
+		}
+	}
+
+	if(highestMoveIndexes.length == m.length)
+		return null;
+
+	return highestMoveIndexes;
+}
+function evalBoard(side, board){
+  var pts = 0;
+  for(var x = 0; x < 8; x++) {
+    for(var y = 0; y < 8; y++) {
+      if(board[x][y].side == side){
+        pts+=values[board[x][y].type];
+      }else{
+        pts-=values[board[x][y].type];
+      }
+      if(Number.isNaN(pts)){
+        err("pts is NaN: ")
+      }
+    }
+  }
+  return pts;
+}</script>
+  </body>
+</html>
