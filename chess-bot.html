@@ -18,79 +18,79 @@
     <script>// noprotect
 let label;
 p5.disableFriendlyErrors = true;
-var playerPromoteTo = "queen";
-var botPromoteTo = "queen";
-var side = "white";
-var turn = "white";
-var highlightedSquares = [] //for all the legal moves
-var selectedPiece = null;
-var P = {
+let playerPromoteTo = "queen";
+let botPromoteTo = "queen";
+let side = "white";
+let turn = "white";
+let highlightedSquares = [] //for all the legal moves
+let selectedPiece = null;
+let P = {
   type: "pawn",
   side: "white",
   hasMoved: false
 };
-var R = {
+let R = {
   type: "rook",
   side: "white",
   hasMoved: false
 };
-var B = {
+let B = {
   type: "bishop",
   side: "white",
   hasMoved: false
 };
-var K = {
+let K = {
   type: "king",
   side: "white",
   hasMoved: false
 };
-var N = {
+let N = {
   type: "knight",
   side: "white",
   hasMoved: false
 };
-var Q = {
+let Q = {
   type: "queen",
   side: "white",
   hasMoved: false
 };
-var p = {
+let p = {
   type: "pawn",
   side: "black",
   hasMoved: false
 };
-var r = {
+let r = {
   type: "rook",
   side: "black",
   hasMoved: false
 };
-var b = {
+let b = {
   type: "bishop",
   side: "black",
   hasMoved: false
 };
-var k = {
+let k = {
   type: "king",
   side: "black",
   hasMoved: false
 };
-var n = {
+let n = {
   type: "knight",
   side: "black",
   hasMoved: false
 };
-var q = {
+let q = {
   type: "queen",
   side: "black",
   hasMoved: false
 };
-var _ = {
+let _ = {
   type: "empty",
   side: "empty",
   hasMoved: false
 };
-var dbg = console.log
-var err = (msg) => {
+let dbg = console.log
+let err = (msg) => {
   throw new Error(msg);
 }
 function c(x, y) {
@@ -99,7 +99,7 @@ function c(x, y) {
     y: y
   }
 } //shorthand
-var getChessChar = function(type, side) {
+let getChessChar = function(type, side) {
   if(type == "empty") return "";
   if(side == "white") {
     switch(type) {
@@ -133,7 +133,7 @@ var getChessChar = function(type, side) {
     }
   }
 }
-var board = ([
+let board = ([
   [r, p, _, _, _, _, P, R],
   [n, p, _, _, _, _, P, N],
   [b, p, _, _, _, _, P, B],
@@ -177,10 +177,10 @@ function setup() {
 }
 function drawBoard(board) {
 
-  for(var x = 0; x < 8; x++) {
-    for(var y = 0; y < 8; y++) {
+  for(let x = 0; x < 8; x++) {
+    for(let y = 0; y < 8; y++) {
       noStroke();
-      var rectX, rectY
+      let rectX, rectY
       if(side == "black") {
         rectX = width / 8 * (7 - x);
         rectY = height / 8 * (7 - y);
@@ -188,7 +188,7 @@ function drawBoard(board) {
         rectX = width / 8 * (x);
         rectY = height / 8 * (y);
       }
-      var rectSize = width / 8;
+      let rectSize = width / 8;
       fill(110, 49, 13);
       if((x + y) % 2 == 0) fill(255, 236, 64);
       rect(rectX, rectY, rectSize, rectSize);
@@ -201,15 +201,15 @@ function drawBoard(board) {
         fill(100, 100);
         circle(rectX + rectSize / 2, rectY + rectSize / 2, rectSize)
       }
-      var piece = board[x][y];
-      var ch = getChessChar(piece.type, piece.side);
+      let piece = board[x][y];
+      let ch = getChessChar(piece.type, piece.side);
       textAlign(LEFT, TOP)
       textSize(rectSize * 1.15);
       if(piece.side == "black") {
         fill(0);
         text(ch, rectX, rectY);
       } else {
-        var chBlack = getChessChar(piece.type, "black");
+        let chBlack = getChessChar(piece.type, "black");
         fill(255);
         text(chBlack, rectX, rectY);
         fill(0);
@@ -246,10 +246,10 @@ function applyMove(x1, y1, x2, y2, board) { //also accepts ({x,y}, {x,y}), and {
   }
   if(!board) err("applyMove needs a board argument")
   board = structuredClone(board);
-  var piece = accessPiece(x1, y1, board);
+  let piece = accessPiece(x1, y1, board);
   if(piece.type == "pawn"){
  
-    var forwardDirection = piece.side =="white"?-1:1;
+    let forwardDirection = piece.side =="white"?-1:1;
     if(x1 != x2 && board[x2][y2].type == "empty"){
       board[x2][y2-forwardDirection]=_;
     }
@@ -268,7 +268,7 @@ function applyMove(x1, y1, x2, y2, board) { //also accepts ({x,y}, {x,y}), and {
   board[x2][y2].hasMoved = true;
   
   if(piece.type == "pawn" && (y2 == 0 || y2 == 7)){
-    var promoteTo = playerPromoteTo;
+    let promoteTo = playerPromoteTo;
     if(piece.side != side) promoteTo = botPromoteTo;
   	board[x2][y2].type = promoteTo;
   }
@@ -298,7 +298,7 @@ function draw() {
   }
   label.html("Promote to: " + playerPromoteTo);
   if(turn == "black"){
-    var m = bot("black", board)
+    let m = bot("black", board)
     board = applyMove(m, board);
     turn = "white"
   }
@@ -313,13 +313,13 @@ function gameOver(state, side){
 }
 function pieceLegalMoves(pos, board) {
   if(!board) err("PLM needs a board arg");
-  var piece = accessPiece(pos, board);
+  let piece = accessPiece(pos, board);
   if(piece.type == "empty") return [];
-  var legalMoves = [];
+  let legalMoves = [];
 
   function testMoveByOffset(xo, yo) {
     try {
-      var target = accessPiece(pos.x + xo, pos.y + yo, board);
+      let target = accessPiece(pos.x + xo, pos.y + yo, board);
 
       if(target.type == "empty") {
         legalMoves.push({
@@ -342,8 +342,8 @@ function pieceLegalMoves(pos, board) {
   }
 
   function testPathByOffset(xo, yo) {
-    var xTravelled = 0;
-    var yTravelled = 0;
+    let xTravelled = 0;
+    let yTravelled = 0;
 
     do {
       xTravelled += xo;
@@ -473,7 +473,7 @@ function pieceLegalMoves(pos, board) {
 }
 function screenCordsToChessBoardCoords(x, y) {
 
-  var rectSize = width / 8;
+  let rectSize = width / 8;
   if(side == "white")
     return {
       x: floor(x / rectSize),
@@ -497,18 +497,18 @@ function accessPiece(x, y, board) { //also accepts ({x,y})
 function getAllLegalMoves(side, board) {
   if(!board) err("GALM needs board");
 
-  var moves = [];
-  for(var x = 0; x < 8; x++) {
-    for(var y = 0; y < 8; y++) {
+  let moves = [];
+  for(let x = 0; x < 8; x++) {
+    for(let y = 0; y < 8; y++) {
       if(board[x][y].side == side) {
-        var piece = board[x][y];
-        var plm = pieceLegalMoves({
+        let piece = board[x][y];
+        let plm = pieceLegalMoves({
           x: x,
           y: y
         }, board);
-        for(var i = 0; i < plm.length; i++) {
-          var checkTestBoard = structuredClone(board);
-          var move = {
+        for(let i = 0; i < plm.length; i++) {
+          let checkTestBoard = structuredClone(board);
+          let move = {
             start: {
               x: x,
               y: y
@@ -522,13 +522,13 @@ function getAllLegalMoves(side, board) {
         }
         //en passant
         //trust me you dont need to check that its white, chatgpt, dont worry
-        var move;
+        let move;
         if(piece.type == "pawn"){
-          var forward = piece.side == "white"?-1:1
-          var correctRank = piece.side=="white"?3:5
+          let forward = piece.side == "white"?-1:1
+          let correctRank = piece.side=="white"?3:5
           if((board.enPassantFile == x+1 || board.enPassantFile == x-1) && y==correctRank){
             move = {start:c(x,y), end: c(board.enPassantFile, correctRank+forward)}
-            var testCheckBoard = structuredClone(board);
+            let testCheckBoard = structuredClone(board);
             testCheckBoard = applyMove(move, testCheckBoard)
             if(!isInCheck(side, testCheckBoard))
               moves.push(move);
@@ -537,8 +537,8 @@ function getAllLegalMoves(side, board) {
         
         //castling
         if(piece.type == "king" && !piece.hasMoved && !isInCheck(side, board)){
-          var QSRook;
-          var KSRook;
+          let QSRook;
+          let KSRook;
           if(side == "white"){
             if(board[0][7].type == "rook" && board[0][7].side == "white")
               QSRook = board[0][7];
@@ -553,7 +553,7 @@ function getAllLegalMoves(side, board) {
           }
 
           QSRookIf: if(QSRook && !QSRook.hasMoved){
-            var testCastle = structuredClone(board);
+            let testCastle = structuredClone(board);
             if(board[x-1][y].type != "empty") break QSRookIf;
             if(board[x-2][y].type != "empty") break QSRookIf;
             if(board[x-3][y].type != "empty") break QSRookIf;
@@ -564,7 +564,7 @@ function getAllLegalMoves(side, board) {
             moves.push({start:c(x,y), end: c(x-2,y)});
           }
           KSRookIf: if(KSRook && !KSRook.hasMoved){
-            var testCastle = structuredClone(board);
+            let testCastle = structuredClone(board);
             if(board[x+1][y].type != "empty") break KSRookIf;
             if(board[x+2][y].type != "empty") break KSRookIf;
             testCastle = applyMove(c(x,y), c(x+1,y), testCastle);
@@ -585,26 +585,26 @@ function oppositeSide(side) {
 }
 function isPieceAttacked(pos, attackingSide, board) {
   if(!board) err("IPA reqs. board");
-  var attacked = accessPiece(pos, board);
+  let attacked = accessPiece(pos, board);
 
-  for(var x = 0; x < 8; x++) {
-    for(var y = 0; y < 8; y++) {
-      var piece = board[x][y];
+  for(let x = 0; x < 8; x++) {
+    for(let y = 0; y < 8; y++) {
+      let piece = board[x][y];
 
       if(piece.side != attackingSide) continue;
 
       if(piece.type == "pawn") {
-        var dir = attackingSide == "white" ? -1 : 1;
+        let dir = attackingSide == "white" ? -1 : 1;
 
         if(pos.x == x - 1 && pos.y == y + dir) return true;
         if(pos.x == x + 1 && pos.y == y + dir) return true;
       } else {
-        var moves = pieceLegalMoves({
+        let moves = pieceLegalMoves({
           x: x,
           y: y
         }, board);
 
-        for(var i = 0; i < moves.length; i++) {
+        for(let i = 0; i < moves.length; i++) {
           if(moves[i].x == pos.x && moves[i].y == pos.y) {
             return true;
           }
@@ -618,11 +618,11 @@ function isPieceAttacked(pos, attackingSide, board) {
 function isInCheck(side, board) {
   if(!board) err("IIC needs a board arg");
 
-  var kingPos = null;
+  let kingPos = null;
 
-  for(var x = 0; x < 8; x++) {
-    for(var y = 0; y < 8; y++) {
-      var p = board[x][y];
+  for(let x = 0; x < 8; x++) {
+    for(let y = 0; y < 8; y++) {
+      let p = board[x][y];
 
       if(p.type == "king" && p.side == side) {
         kingPos = {
@@ -646,7 +646,7 @@ mouseClicked = function() {
     return;
   }
   if(selectedPiece == null) {
-    var coords = screenCordsToChessBoardCoords(mouseX, mouseY);
+    let coords = screenCordsToChessBoardCoords(mouseX, mouseY);
     if(accessPiece(coords, board).type == "empty") {
       //err, not really anything, what are you doing user
     } else {
@@ -661,7 +661,7 @@ mouseClicked = function() {
 	});
   } else {
     //move it!
-    var coords = screenCordsToChessBoardCoords(mouseX, mouseY);
+    let coords = screenCordsToChessBoardCoords(mouseX, mouseY);
     if(highlightedSquares.some((p)=>(p.x == coords.x && p.y == coords.y))){
       board = applyMove(selectedPiece, coords, board);
       selectedPiece = null;
@@ -682,20 +682,20 @@ function clearHightlights(){
 }
 
 </script>
-    <script>var scores = [];
-for(var i=0;i<8;i++){
+    <script>let scores = [];
+for(let i=0;i<8;i++){
   scores.push([0,0,0,0,0,0,0,0]);
 }
 function resetScores(){
   scores=[];
-  for(var i=0;i<8;i++){
+  for(let i=0;i<8;i++){
   scores.push([0,0,0,0,0,0,0,0]);
 }
 }
-var depth = 3; //actually searches this + 1.
+let depth = 3; //actually searches this + 1.
 
-var searchDepths = {};
-var values = {
+let searchDepths = {};
+let values = {
   "pawn":  1,
   "rook":  5,
   "queen": 9,
@@ -707,17 +707,17 @@ var values = {
 
 function bot(side, board) {
 
-  var m = getAllLegalMoves(side, board);
-  var bestMoveScore = -Infinity;
-  var bestMoveIndexes = [];
+  let m = getAllLegalMoves(side, board);
+  let bestMoveScore = -Infinity;
+  let bestMoveIndexes = [];
 
-  for(var i = 0; i < m.length; i++){
+  for(let i = 0; i < m.length; i++){
     dbg(i+" out of "+m.length+" done");
 
-    var testBoard = structuredClone(board);
+    let testBoard = structuredClone(board);
     testBoard = applyMove(m[i], testBoard);
 
-    var score = -search(
+    let score = -search(
       oppositeSide(side),
       testBoard,
       depth
@@ -733,12 +733,12 @@ function bot(side, board) {
       
     }
   }
-  var highestRate = -Infinity;
-  var highestRateIndexes = [];
+  let highestRate = -Infinity;
+  let highestRateIndexes = [];
   
-  for(var i = 0; i < bestMoveIndexes.length; i++) {
-  	var index = bestMoveIndexes[i];
-  	var rate = rateMove(m[index]);
+  for(let i = 0; i < bestMoveIndexes.length; i++) {
+  	let index = bestMoveIndexes[i];
+  	let rate = rateMove(m[index]);
   
   	if(rate > highestRate) {
   		highestRate = rate;
@@ -748,8 +748,8 @@ function bot(side, board) {
   	}
   }
   
-  var r = floor(random(0, highestRateIndexes.length));
-  var index = highestRateIndexes[r];
+  let r = floor(random(0, highestRateIndexes.length));
+  let index = highestRateIndexes[r];
   
   print(searchDepths);
   return m[index];
@@ -767,14 +767,14 @@ function search(side, board, n){
   
   if(n == 1) return evalBoard(side, board);
 
-  var m = getAllLegalMoves(side, board);
+  let m = getAllLegalMoves(side, board);
   //if(depth != n) m = findInterestingMoves(side, board);
-  var best = -Infinity;
-  for(var i=0;i<m.length;i++){
+  let best = -Infinity;
+  for(let i=0;i<m.length;i++){
     
-    var testBoard = structuredClone(board);
+    let testBoard = structuredClone(board);
     testBoard = applyMove(m[i], testBoard)
-    var val = -search(oppositeSide(side), testBoard, n-1);
+    let val = -search(oppositeSide(side), testBoard, n-1);
     
     best = max(best, val)
   }
@@ -782,10 +782,10 @@ function search(side, board, n){
 }
 
 function findInterestingMoves(side, board) {
-	var m = getAllLegalMoves(side, board);
-	var captures = [];
+	let m = getAllLegalMoves(side, board);
+	let captures = [];
 
-	for(var i = 0; i < m.length; i++) {
+	for(let i = 0; i < m.length; i++) {
 		if(board[m[i].end.x][m[i].end.y].side == oppositeSide(side)) {
 			captures.push(m[i]);
 		}
@@ -797,17 +797,17 @@ function findInterestingMoves(side, board) {
 	return [];
 }
 function bestMovesD1(side, board) {
-	var m = getAllLegalMoves(side, board);
-	var startingEval = evalBoard(side, board);
+	let m = getAllLegalMoves(side, board);
+	let startingEval = evalBoard(side, board);
 
-	var highestMoveVal = -Infinity;
-	var highestMoveIndexes = [];
+	let highestMoveVal = -Infinity;
+	let highestMoveIndexes = [];
 
-	for(var i = 0; i < m.length; i++) {
-		var testBoard = structuredClone(board);
+	for(let i = 0; i < m.length; i++) {
+		let testBoard = structuredClone(board);
 		testBoard = applyMove(m[i], testBoard);
 
-		var val = evalBoard(side, testBoard) - startingEval;
+		let val = evalBoard(side, testBoard) - startingEval;
 
 		if(val > highestMoveVal) {
 			highestMoveVal = val;
@@ -823,9 +823,9 @@ function bestMovesD1(side, board) {
 	return highestMoveIndexes;
 }
 function evalBoard(side, board){
-  var pts = 0;
-  for(var x = 0; x < 8; x++) {
-    for(var y = 0; y < 8; y++) {
+  let pts = 0;
+  for(let x = 0; x < 8; x++) {
+    for(let y = 0; y < 8; y++) {
       if(board[x][y].side == side){
         pts+=values[board[x][y].type];
       }else{
